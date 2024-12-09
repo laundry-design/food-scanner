@@ -1,50 +1,46 @@
-# Welcome to your Expo app 👋
+# Calories from image with Gemini AI
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is a React Native application that allows users to take a photo of their food and get nutritional information using Google's Generative AI Gemini.
 
-## Get started
+## Features
 
-1. Install dependencies
+- Take a photo or choose an image from the gallery to analyze the food.
+- Get nutritional information including calories, protein, fat, carbohydrates, and name of the food.
+- Use your own Gemini api key.
 
-   ```bash
-   npm install
-   ```
+## Installation
 
-2. Start the app
+# You can use a prebuilt APK in the releases or you can build the app yourself following this steps:
 
-   ```bash
-    npx expo start
-   ```
+1. Clone the repository:
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```sh
+git clone https://github.com/antomanc/calories-from-image-gemini.git
+cd calories-from-image-gemini 
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Install dependencies:
 
-## Learn more
+```sh
+bun install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+3. Setup the android build environment:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```sh
+bun run expo prebuild
+```
 
-## Join the community
+4. Build the APK
 
-Join our community of developers creating universal apps.
+```sh
+cd android
+./gradlew assembleRelease
+```
+The output APK will be in this path:
+android/app/build/outputs/apk/release/app-release.apk
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Usage
+You can apply your Gemini API KEY directly inside the app, in the settings page.
+
+## Feel free to ask for features or open issues
