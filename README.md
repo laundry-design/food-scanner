@@ -10,7 +10,7 @@ This is a React Native application that allows users to take a photo of their fo
 
 ## Installation
 
-# You can use a prebuilt APK in the releases or you can build the app yourself following this steps:
+You can use a prebuilt APK in the releases or you can build the app yourself following this steps:
 
 1. Clone the repository:
 
