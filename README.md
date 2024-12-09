@@ -1,6 +1,5 @@
 # Calories from image with Gemini AI
-![photo_5961074566153487927_y](https://github.com/user-attachments/assets/f7d24ef1-a33c-4377-9c6b-26807f893bbe)
-
+<img src="https://github.com/user-attachments/assets/f7d24ef1-a33c-4377-9c6b-26807f893bbe" alt="app screenshot" height="400">
 This is a React Native application that allows users to take a photo of their food and get nutritional information using Google's Generative AI Gemini.
 
 ## Features
