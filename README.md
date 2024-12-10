@@ -4,6 +4,8 @@
 This is a React Native application that allows users to take a photo of their food and get nutritional information using Google's Generative AI Gemini.
 Do not overestimate the AI accuracy, I plan to use it only for meals where it's impossible to get nutritional information by myself. Weighting your food will always be more accurate.
 
+Currently the Google AI model Gemini 1.5 Flash has a very good 15 requests per minute and 1500 daily requests free limit, so you should be able to use it without worrying about costs.
+
 ## Features
 
 - Take a photo or choose an image from the gallery to analyze the food.
