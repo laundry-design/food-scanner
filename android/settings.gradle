@@ -21,7 +21,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   }
 }
 
-rootProject.name = 'calorie-from-photo-ai'
+rootProject.name = 'Calories AI'
 
 dependencyResolutionManagement {
   versionCatalogs {

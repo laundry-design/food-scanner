@@ -1,6 +1,10 @@
 {
   "name": "calorie-from-photo-ai",
   "main": "expo-router/entry",
+  "author": {
+    "name": "Antonio Mancini",
+    "email": "an.manc25@gmail.com"
+  },
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
