@@ -24,6 +24,7 @@ export default function AIImageScreen() {
   const handleTakePhoto = async () => {
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ["images"],
+      cameraType: ImagePicker.CameraType.back,
       quality: 1,
     });
 
