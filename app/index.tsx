@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { View, StyleSheet, Animated } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import LottieView from "lottie-react-native";
@@ -24,7 +24,6 @@ export default function AIImageScreen() {
   const handleTakePhoto = async () => {
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ["images"],
-      cameraType: ImagePicker.CameraType.back,
       quality: 1,
     });
 
@@ -44,7 +43,12 @@ export default function AIImageScreen() {
     router.push("/settings");
   };
 
-  const { API_KEY } = useSettings();
+  const { API_KEY, geminiModel } = useSettings();
+
+  const buttonDisabled = useMemo(
+    () => !API_KEY || !geminiModel,
+    [API_KEY, geminiModel]
+  );
 
   return (
     <View
@@ -78,7 +82,7 @@ export default function AIImageScreen() {
       <View style={styles.buttonContainer}>
         <IconButton
           mode="contained"
-          disabled={!API_KEY}
+          disabled={buttonDisabled}
           icon="image"
           size={48}
           onPress={handleChooseImage}
@@ -87,7 +91,7 @@ export default function AIImageScreen() {
 
         <IconButton
           mode="contained"
-          disabled={!API_KEY}
+          disabled={buttonDisabled}
           icon="camera"
           size={48}
           onPress={handleTakePhoto}
@@ -97,6 +101,11 @@ export default function AIImageScreen() {
       {!API_KEY && (
         <Text style={{ color: theme.colors.error }}>
           Please set your API key in the settings
+        </Text>
+      )}
+      {API_KEY && !geminiModel && (
+        <Text style={{ color: theme.colors.error }}>
+          Please set your Gemini model name in the settings
         </Text>
       )}
     </View>
