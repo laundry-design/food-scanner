@@ -10,17 +10,21 @@ import {
 } from "react-native-paper";
 
 export default function SettingsScreen() {
-  const { API_KEY, updateAPIKey } = useSettings();
+  const { API_KEY, geminiModel, updateAPIKey, updateGeminiModel } =
+    useSettings();
   const theme = useTheme();
   const [key, setKey] = useState(API_KEY || "");
+  const [model, setGeminiModel] = useState("");
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     setKey(API_KEY || "");
-  }, [API_KEY]);
+    setGeminiModel(geminiModel || "");
+  }, [API_KEY, geminiModel]);
 
   const saveKey = async () => {
     updateAPIKey(key);
+    updateGeminiModel(model);
     setVisible(true);
   };
 
@@ -32,6 +36,12 @@ export default function SettingsScreen() {
         label="Gemini API Key"
         value={key}
         onChangeText={setKey}
+        style={styles.input}
+      />
+      <TextInput
+        label="Gemini model name"
+        value={model}
+        onChangeText={setGeminiModel}
         style={styles.input}
       />
       <Button mode="contained" onPress={saveKey}>

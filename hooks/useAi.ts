@@ -34,11 +34,15 @@ interface FoodInformation {
 }
 
 export const useAi = (): AiHook => {
-  const { API_KEY } = useSettings();
+  const { API_KEY, geminiModel } = useSettings();
 
   if (!API_KEY) {
+    throw new Error("API Key is missing. Please set the KEY in the settings.");
+  }
+
+  if (!geminiModel) {
     throw new Error(
-      "API Key is missing. Please set the GEMINI_API_KEY environment variable."
+      "Gemini model name is missing. Please set the Gemini model name in the settings."
     );
   }
 
