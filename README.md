@@ -12,6 +12,7 @@ Currently the Google AI model Gemini 1.5 Flash has a very good 15 requests per m
 - Take a photo or choose an image from the gallery to analyze the food.
 - Get nutritional information including calories, protein, fat, carbohydrates, and name of the food.
 - Use your own Gemini api key.
+- Change the AI model in app during runtime
 
 ## Installation
 
