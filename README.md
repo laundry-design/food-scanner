@@ -1,4 +1,6 @@
 # Calories from image with Gemini AI
+[<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80">](https://github.com/antomanc/calories-from-image-gemini/releases/latest)
+
 <img src="https://github.com/user-attachments/assets/f7d24ef1-a33c-4377-9c6b-26807f893bbe" alt="app screenshot" height="400">
 <img src="https://github.com/user-attachments/assets/e73d1d46-471d-4c75-a30f-b03143896a81" alt="app screenshot" height="400">
 
