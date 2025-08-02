@@ -1,0 +1,98 @@
+import { AnimeTheme } from '@/types/theme';
+
+export const baseTheme: Omit<AnimeTheme, 'id' | 'name' | 'description' | 'category' | 'series' | 'season' | 'rarity' | 'colors' | 'assets'> = {
+  typography: {
+    fontFamily: {
+      regular: 'System',
+      medium: 'System',
+      bold: 'System',
+      light: 'System',
+    },
+    fontSize: {
+      displayLarge: 57,
+      displayMedium: 45,
+      displaySmall: 36,
+      headlineLarge: 32,
+      headlineMedium: 28,
+      headlineSmall: 24,
+      titleLarge: 22,
+      titleMedium: 16,
+      titleSmall: 14,
+      bodyLarge: 16,
+      bodyMedium: 14,
+      bodySmall: 12,
+      labelLarge: 14,
+      labelMedium: 12,
+      labelSmall: 11,
+    },
+    lineHeight: {
+      displayLarge: 64,
+      displayMedium: 52,
+      displaySmall: 44,
+      headlineLarge: 40,
+      headlineMedium: 36,
+      headlineSmall: 32,
+      titleLarge: 28,
+      titleMedium: 24,
+      titleSmall: 20,
+      bodyLarge: 24,
+      bodyMedium: 20,
+      bodySmall: 16,
+      labelLarge: 20,
+      labelMedium: 16,
+      labelSmall: 16,
+    },
+  },
+  effects: {
+    borderRadius: {
+      small: 4,
+      medium: 8,
+      large: 12,
+      extraLarge: 16,
+    },
+    spacing: {
+      xs: 4,
+      sm: 8,
+      md: 16,
+      lg: 24,
+      xl: 32,
+      xxl: 48,
+    },
+    shadows: {
+      small: {
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.18,
+        shadowRadius: 1.0,
+        elevation: 1,
+      },
+      medium: {
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+      },
+      large: {
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.30,
+        shadowRadius: 4.65,
+        elevation: 8,
+      },
+    },
+    animations: {
+      duration: {
+        fast: 200,
+        normal: 300,
+        slow: 500,
+      },
+      easing: {
+        easeIn: 'ease-in',
+        easeOut: 'ease-out',
+        easeInOut: 'ease-in-out',
+      },
+    },
+  },
+  custom: {},
+}; 

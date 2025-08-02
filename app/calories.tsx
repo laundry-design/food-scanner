@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { ActivityIndicator, Card, Text, useTheme } from "react-native-paper";
+import { ActivityIndicator, Card, Text, useTheme, Button } from "react-native-paper";
 import { useRoute } from "@react-navigation/native";
 import { useAi } from "../hooks/useAi";
 import { NutritionalItem } from "../components/NuntritionalItem";
@@ -22,18 +22,35 @@ export default function CaloriesScreen() {
 
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchFoodInfo = async () => {
-      try {
-        const result = await postImage(imageUri);
-        setFoodInfo(result);
-      } catch (err: any) {
-        setError(err.message || "An unexpected error occurred.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchFoodInfo = async () => {
+    try {
+      console.log('Starting AI analysis for image:', imageUri);
+      
+      // Add timeout to prevent infinite loading
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timeout - please try again')), 30000); // 30 seconds
+      });
+      
+      const resultPromise = postImage(imageUri);
+      const result = await Promise.race([resultPromise, timeoutPromise]) as {
+        name: string;
+        calories: number;
+        protein: number;
+        fat: number;
+        carbohydrates: number;
+      };
+      
+      console.log('AI analysis result:', result);
+      setFoodInfo(result);
+    } catch (err: any) {
+      console.error('AI analysis error:', err);
+      setError(err.message || "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchFoodInfo();
   }, [imageUri, postImage]);
 
@@ -73,6 +90,17 @@ export default function CaloriesScreen() {
         <Text style={[styles.errorText, { color: theme.colors.onBackground }]}>
           {error}
         </Text>
+        <Button
+          mode="contained"
+          onPress={() => {
+            setError(null);
+            setLoading(true);
+            fetchFoodInfo();
+          }}
+          style={{ marginTop: 16 }}
+        >
+          Try Again
+        </Button>
       </View>
     );
   }

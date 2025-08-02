@@ -8,6 +8,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "dev": "expo start --web --dev-client",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
@@ -21,6 +22,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
     "@google/generative-ai": "^0.21.0",
+    "@lottiefiles/dotlottie-react": "^0.6.5",
     "@react-native-async-storage/async-storage": "^2.1.0",
     "@react-navigation/bottom-tabs": "^7.0.0",
     "@react-navigation/native": "^7.0.0",

@@ -19,6 +19,7 @@ import {
   PaperProvider,
 } from "react-native-paper";
 import { SettingsProvider } from "@/providers/SettingsContext";
+import { ThemeProvider as AnimeThemeProvider, useTheme } from "@/providers/ThemeContext";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -43,30 +44,17 @@ const { LightTheme, DarkTheme } = adaptNavigationTheme({
 const CombinedLightTheme = merge(LightTheme, customLightTheme);
 const CombinedDarkTheme = merge(DarkTheme, customDarkTheme);
 
-export default function RootLayout() {
-  const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  });
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
+function AppContent() {
+  const { paperTheme, isLoading } = useTheme();
   const colorScheme = useColorScheme();
 
-  const paperTheme =
-    colorScheme === "dark" ? CombinedDarkTheme : CombinedLightTheme;
-
-  if (!loaded) {
-    return null;
-  }
+  // Use anime theme if available, otherwise fall back to default theme
+  const theme = paperTheme || (colorScheme === "dark" ? CombinedDarkTheme : CombinedLightTheme);
 
   return (
-    <PaperProvider theme={paperTheme}>
+    <PaperProvider theme={theme}>
       {/* @ts-ignore */}
-      <ThemeProvider value={paperTheme}>
+      <ThemeProvider value={theme}>
         <SettingsProvider>
           <Stack>
             <Stack.Screen name="index" options={{ headerShown: false }} />
@@ -83,5 +71,27 @@ export default function RootLayout() {
         </SettingsProvider>
       </ThemeProvider>
     </PaperProvider>
+  );
+}
+
+export default function RootLayout() {
+  const [loaded] = useFonts({
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+  });
+
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
+
+  if (!loaded) {
+    return null;
+  }
+
+  return (
+    <AnimeThemeProvider>
+      <AppContent />
+    </AnimeThemeProvider>
   );
 }
