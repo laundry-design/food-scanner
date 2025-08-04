@@ -13,7 +13,7 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
   const scaleAnim = new Animated.Value(0.8);
 
   useEffect(() => {
-    // Start animations
+    // Start initial animations
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -26,20 +26,53 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
         friction: 7,
         useNativeDriver: true,
       }),
-    ]).start();
-
-    // Auto-hide splash screen after 2.5 seconds
-    const timer = setTimeout(() => {
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true,
-      }).start(() => {
-        onFinish();
-      });
-    }, 2500);
-
-    return () => clearTimeout(timer);
+    ]).start(() => {
+      // After initial fade-in, start the fade sequence
+      setTimeout(() => {
+        // Fade out a bit
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }).start(() => {
+          // Then fade back in
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 400,
+            useNativeDriver: true,
+          }).start(() => {
+            // After some time, fade out completely
+            setTimeout(() => {
+              Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 500,
+                useNativeDriver: true,
+              }).start(() => {
+                // Then fade back in after a pause
+                setTimeout(() => {
+                  Animated.timing(fadeAnim, {
+                    toValue: 1,
+                    duration: 800,
+                    useNativeDriver: true,
+                  }).start(() => {
+                    // Final fade out and finish
+                    setTimeout(() => {
+                      Animated.timing(fadeAnim, {
+                        toValue: 1,
+                        duration: 500,
+                        useNativeDriver: true,
+                      }).start(() => {
+                        onFinish();
+                      });
+                    }, 1000);
+                  });
+                }, 500);
+              });
+            }, 1000);
+          });
+        });
+      }, 500);
+    });
   }, []);
 
   return (
