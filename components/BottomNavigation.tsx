@@ -43,10 +43,10 @@ const navigationItems: NavigationItem[] = [
     label: 'Camera'
   },
   {
-    id: 'ai',
-    iconName: 'star',
+    id: 'diets',
+    iconName: 'heart',
     active: false,
-    label: 'AI'
+    label: 'Diets'
   },
   {
     id: 'settings',
