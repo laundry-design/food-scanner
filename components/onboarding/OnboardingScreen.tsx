@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { FontStyles } from '@/constants/Fonts';
 
 const { width, height } = Dimensions.get('window');
 
@@ -44,16 +45,14 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    ...FontStyles.h1,
     textAlign: 'center',
     marginBottom: 16,
   },
   subtitle: {
-    fontSize: 18,
+    ...FontStyles.bodyLarge,
     textAlign: 'center',
     opacity: 0.8,
-    lineHeight: 24,
     marginBottom: 40,
   },
   customContent: {

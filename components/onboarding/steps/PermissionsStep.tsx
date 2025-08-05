@@ -4,6 +4,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { ThemedText } from '@/components/ThemedText';
 import OnboardingScreen from '../OnboardingScreen';
 import OnboardingButton from '../OnboardingButton';
+import { FontStyles } from '@/constants/Fonts';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export default function PermissionsStep() {
@@ -129,12 +130,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   permissionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...FontStyles.bodyLarge,
+    fontFamily: FontStyles.h4.fontFamily, // Use semiBold for titles
     marginBottom: 4,
   },
   permissionDescription: {
-    fontSize: 14,
+    ...FontStyles.bodySmall,
     opacity: 0.7,
   },
   permissionButton: {

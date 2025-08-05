@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Image, StyleSheet, Animated, Dimensions } from 'react-native';
 import { ThemedText } from './ThemedText';
+import { Fonts, FontStyles } from '@/constants/Fonts';
 
 const { width, height } = Dimensions.get('window');
 
@@ -86,9 +87,9 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
           },
         ]}
       >
-       
-        <ThemedText style={styles.title}>Eating</ThemedText>
+<ThemedText style={styles.title}>Eating</ThemedText>
         <ThemedText style={styles.subtitle}>made easy</ThemedText>
+<View style={styles.contentSection}/> 
  <Image
           source={require('../assets/images/splash/luffy_fat.png')}
           style={styles.logo}
@@ -110,20 +111,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
- logo: {
+ logo: { 
     width: width * 0.8,        // 50% of screen width
     height: width * 0.8,       // Keep it square
-    marginBottom: height * 0.05, // 5% of screen height
+    marginBottom: height * 0.05,// 5% of screen height
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    ...FontStyles.h2,
     marginBottom: 10,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
+    ...FontStyles.body,
     opacity: 0.7,
     textAlign: 'center',
   },
+contentSection: {
+  height: 160, // Change to any height you want
+  // ... other styles
+}
 });

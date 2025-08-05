@@ -1,9 +1,10 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import { ThemedText } from '@/components/ThemedText';
-import OnboardingScreen from '../OnboardingScreen';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+import { FontStyles } from '@/constants/Fonts';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import OnboardingScreen from '../OnboardingScreen';
 
 const features = [
   {
@@ -82,12 +83,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   featureTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...FontStyles.bodyLarge,
+    fontFamily: FontStyles.h4.fontFamily, // Use semiBold for titles
     marginBottom: 4,
   },
   featureDescription: {
-    fontSize: 14,
+    ...FontStyles.bodySmall,
     opacity: 0.7,
   },
 });

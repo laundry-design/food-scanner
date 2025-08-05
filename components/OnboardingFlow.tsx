@@ -1,20 +1,26 @@
-import React, { useState, useRef } from 'react';
-import { View, StyleSheet, Dimensions, StatusBar } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useRef } from 'react';
+import { Dimensions, StatusBar, StyleSheet, View } from 'react-native';
 import PagerView from 'react-native-pager-view';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming,
-  runOnJS 
+import Animated, {
+    runOnJS,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming
 } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import ProgressIndicator from './onboarding/ProgressIndicator';
+import { useOnboardingStore } from '@/stores/onboardingStore';
+import { useUserStore } from '@/stores/userStore';
 import OnboardingButton from './onboarding/OnboardingButton';
-import WelcomeStep from './onboarding/steps/WelcomeStep';
-import FeaturesStep from './onboarding/steps/FeaturesStep';
-import PermissionsStep from './onboarding/steps/PermissionsStep';
-import GetStartedStep from './onboarding/steps/GetStartedStep';
+import ProgressIndicator from './onboarding/ProgressIndicator';
+import AgeStep from './onboarding/steps/AgeStep';
+import DietFocusStep from './onboarding/steps/DietFocusStep';
+import FitnessGoalStep from './onboarding/steps/FitnessGoalStep';
+import GenderStep from './onboarding/steps/GenderStep';
+import GymActivityStep from './onboarding/steps/GymActivityStep';
+import HeightStep from './onboarding/steps/HeightStep';
+import PlanStep from './onboarding/steps/PlanStep';
+import WeightStep from './onboarding/steps/WeightStep';
 
 const { width, height } = Dimensions.get('window');
 
@@ -22,36 +28,59 @@ interface OnboardingFlowProps {
   onComplete: () => void;
 }
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 8;
 
 export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
-  const [currentStep, setCurrentStep] = useState(1);
+  const {
+    currentStep,
+    onboardingData,
+    isOnboardingActive,
+    setCurrentStep,
+    updateOnboardingData,
+    goToNextStep,
+    goToPreviousStep,
+    canProceedToNext,
+    completeOnboarding
+  } = useOnboardingStore();
+
+  const { completeOnboarding: completeUserOnboarding } = useUserStore();
+  
   const pagerRef = useRef<PagerView>(null);
   const opacity = useSharedValue(1);
 
   const isLastStep = currentStep === TOTAL_STEPS;
   const isFirstStep = currentStep === 1;
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (isLastStep) {
+      // Complete onboarding and save to user store
+      await completeUserOnboarding(onboardingData);
+      completeOnboarding();
+      
       // Animate out and complete onboarding
       opacity.value = withTiming(0, { duration: 300 }, () => {
         runOnJS(onComplete)();
       });
     } else {
-      pagerRef.current?.setPage(currentStep);
-      setCurrentStep(currentStep + 1);
+      if (canProceedToNext()) {
+        pagerRef.current?.setPage(currentStep);
+        goToNextStep();
+      }
     }
   };
 
   const handleBack = () => {
     if (!isFirstStep) {
       pagerRef.current?.setPage(currentStep - 2);
-      setCurrentStep(currentStep - 1);
+      goToPreviousStep();
     }
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
+    // Complete onboarding with current data
+    await completeUserOnboarding(onboardingData);
+    completeOnboarding();
+    
     opacity.value = withTiming(0, { duration: 300 }, () => {
       runOnJS(onComplete)();
     });
@@ -70,15 +99,29 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const renderStep = (step: number) => {
     switch (step) {
       case 1:
-        return <WelcomeStep />;
+        return <PlanStep onPlanSelect={(plan) => updateOnboardingData('plan', plan)} />;
       case 2:
-        return <FeaturesStep />;
+        return <AgeStep onAgeChange={(age) => updateOnboardingData('age', age)} />;
       case 3:
-        return <PermissionsStep />;
+        return <WeightStep onWeightChange={(weight, unit) => {
+          updateOnboardingData('weight', weight);
+          updateOnboardingData('weightUnit', unit);
+        }} />;
       case 4:
-        return <GetStartedStep />;
+        return <HeightStep onHeightChange={(height, unit) => {
+          updateOnboardingData('height', height);
+          updateOnboardingData('heightUnit', unit);
+        }} />;
+      case 5:
+        return <GenderStep onGenderSelect={(gender) => updateOnboardingData('gender', gender)} />;
+      case 6:
+        return <FitnessGoalStep onGoalSelect={(goal) => updateOnboardingData('fitnessGoal', goal)} />;
+      case 7:
+        return <GymActivityStep onActivitySelect={(activity) => updateOnboardingData('gymActivity', activity)} />;
+      case 8:
+        return <DietFocusStep onDietFocusSelect={(dietFocus) => updateOnboardingData('dietFocus', dietFocus)} />;
       default:
-        return <WelcomeStep />;
+        return <PlanStep onPlanSelect={(plan) => updateOnboardingData('plan', plan)} />;
     }
   };
 
@@ -134,6 +177,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               title={isLastStep ? "Get Started" : "Next"}
               onPress={handleNext}
               variant="primary"
+              showArrow={!isLastStep}
               style={[styles.nextButton, isFirstStep && styles.fullWidthButton]}
             />
           </View>

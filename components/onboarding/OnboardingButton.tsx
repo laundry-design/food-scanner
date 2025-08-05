@@ -1,11 +1,12 @@
-import React from 'react';
-import { TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import Animated, { 
-  useAnimatedStyle, 
-  withTiming, 
-  useSharedValue,
-  withSpring 
+import { IconSymbol } from '@/components/ui/IconSymbol';
+import { FontStyles } from '@/constants/Fonts';
+import React from 'react';
+import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring
 } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
@@ -17,6 +18,7 @@ interface OnboardingButtonProps {
   variant?: 'primary' | 'secondary';
   disabled?: boolean;
   style?: any;
+  showArrow?: boolean;
 }
 
 export default function OnboardingButton({ 
@@ -24,7 +26,8 @@ export default function OnboardingButton({
   onPress, 
   variant = 'primary', 
   disabled = false,
-  style 
+  style,
+  showArrow = false
 }: OnboardingButtonProps) {
   const scale = useSharedValue(1);
 
@@ -59,15 +62,25 @@ export default function OnboardingButton({
       disabled={disabled}
       activeOpacity={0.8}
     >
-      <ThemedText 
-        style={[
-          styles.buttonText,
-          isPrimary ? styles.primaryButtonText : styles.secondaryButtonText,
-          disabled && styles.disabledButtonText,
-        ]}
-      >
-        {title}
-      </ThemedText>
+      <View style={styles.buttonContent}>
+        <ThemedText 
+          style={[
+            styles.buttonText,
+            isPrimary ? styles.primaryButtonText : styles.secondaryButtonText,
+            disabled && styles.disabledButtonText,
+          ]}
+        >
+          {title}
+        </ThemedText>
+        {showArrow && (
+          <IconSymbol 
+            name="chevron.right" 
+            size={20} 
+            color={isPrimary ? '#FFFFFF' : '#3E2C1C'} 
+            style={styles.arrowIcon}
+          />
+        )}
+      </View>
     </AnimatedTouchableOpacity>
   );
 }
@@ -82,27 +95,34 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   primaryButton: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#3E2C1C',
   },
   secondaryButton: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: '#FF6B35',
+    borderColor: '#3E2C1C',
   },
   disabledButton: {
     opacity: 0.5,
   },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   buttonText: {
-    fontSize: 18,
-    fontWeight: '600',
+    ...FontStyles.buttonLarge,
   },
   primaryButtonText: {
     color: '#FFFFFF',
   },
   secondaryButtonText: {
-    color: '#FF6B35',
+    color: '#3E2C1C',
   },
   disabledButtonText: {
     opacity: 0.6,
+  },
+  arrowIcon: {
+    marginLeft: 8,
   },
 });
