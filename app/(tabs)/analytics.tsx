@@ -29,7 +29,7 @@ export default function AnalyticsScreen() {
   ];
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: Colors[colorScheme ?? 'dark'].background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: '#000000' }]}>
       <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}

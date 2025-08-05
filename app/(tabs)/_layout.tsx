@@ -19,13 +19,24 @@ export default function TabLayout() {
   // Update active tab based on current route
   useEffect(() => {
     const currentTab = segments[segments.length - 1] || 'index';
-    setActiveTab(currentTab);
+    // Handle home tab - if we're at the root of tabs, set to index
+    if (segments.length === 1) {
+      setActiveTab('index');
+    } else {
+      setActiveTab(currentTab as string);
+    }
   }, [segments]);
 
   const handleTabPress = (tabId: string) => {
     console.log('Tab pressed:', tabId);
     setActiveTab(tabId);
-    router.push(`/(tabs)/${tabId}` as any);
+    
+    // Handle home tab navigation
+    if (tabId === 'index') {
+      router.push('/(tabs)/' as any);
+    } else {
+      router.push(`/(tabs)/${tabId}` as any);
+    }
   };
 
   return (
@@ -59,9 +70,9 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="ai"
+          name="diets"
           options={{
-            title: 'AI',
+            title: 'Diets',
           }}
         />
         <Tabs.Screen
@@ -74,6 +85,12 @@ export default function TabLayout() {
           name="settings"
           options={{
             title: 'Settings',
+          }}
+        />
+        <Tabs.Screen
+          name="diet-detail"
+          options={{
+            href: null, // Hide this tab from the tab bar
           }}
         />
         <Tabs.Screen

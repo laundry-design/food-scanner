@@ -37,7 +37,7 @@ export function TimeRangeSelector({ selected, onSelect }: TimeRangeSelectorProps
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#2a2a2a',
+    backgroundColor: '#ffffff',
     borderRadius: 20,
     padding: 4,
     marginVertical: 16,
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#ffffff',
+    color: '#666666',
   },
   selectedOptionText: {
     color: '#ffffff',
