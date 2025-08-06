@@ -1,7 +1,7 @@
 import { ThemedText } from '@/components/ThemedText';
 import { FontStyles } from '@/constants/Fonts';
 import React from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, View, Text } from 'react-native';
 import Animated, {
     useAnimatedStyle,
     withTiming
@@ -36,34 +36,6 @@ export default function ProgressIndicator({ currentStep, totalSteps, style }: Pr
     };
   });
 
-  const renderDots = () => {
-    return Array.from({ length: totalSteps }, (_, index) => {
-      const isActive = index < currentStep;
-      const isCurrent = index === currentStep - 1;
-
-      const dotAnimatedStyle = useAnimatedStyle(() => {
-        const scale = isCurrent ? withTiming(1.2, { duration: 200 }) : withTiming(1, { duration: 200 });
-        const opacity = isActive ? withTiming(1, { duration: 200 }) : withTiming(0.3, { duration: 200 });
-        
-        return {
-          transform: [{ scale }],
-          opacity,
-        };
-      });
-
-      return (
-        <Animated.View
-          key={index}
-          style={[
-            styles.dot,
-            dotAnimatedStyle,
-            isActive && styles.activeDot,
-          ]}
-        />
-      );
-    });
-  };
-
   return (
     <View style={[styles.container, style]}>
       {/* Progress Bar with Pirate Ship */}
@@ -95,11 +67,6 @@ export default function ProgressIndicator({ currentStep, totalSteps, style }: Pr
         <ThemedText style={styles.stepText}>
           {currentStep} OF {totalSteps}
         </ThemedText>
-      </View>
-      
-      {/* Dots Indicator */}
-      <View style={styles.dotsContainer}>
-        {renderDots()}
       </View>
     </View>
   );
@@ -189,23 +156,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   stepText: {
-    ...FontStyles.bodyMedium,
+    ...FontStyles.bodyLarge,
     color: '#FFFFFF',
     fontWeight: '600',
-  },
-  dotsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    marginHorizontal: 4,
-  },
-  activeDot: {
-    backgroundColor: '#FFA500',
   },
 });

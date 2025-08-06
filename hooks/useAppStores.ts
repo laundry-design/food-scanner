@@ -1,9 +1,11 @@
 import { useOnboardingStore } from '@/stores/onboardingStore';
 import { useUserStore } from '@/stores/userStore';
+import { useAuthStore } from '@/stores/authStore';
 
 export const useAppStores = () => {
   const userStore = useUserStore();
   const onboardingStore = useOnboardingStore();
+  const authStore = useAuthStore();
 
   return {
     // User store
@@ -40,5 +42,16 @@ export const useAppStores = () => {
       await userStore.resetUser();
       onboardingStore.startOnboarding();
     },
+
+    // Auth store
+    authUser: authStore.user,
+    token: authStore.token,
+    isAuthenticated: authStore.isAuthenticated,
+    authIsLoading: authStore.isLoading,
+    login: authStore.login,
+    register: authStore.register,
+    logout: authStore.logout,
+    checkAuth: authStore.checkAuth,
+    updateAuthUser: authStore.updateUser,
   };
 }; 

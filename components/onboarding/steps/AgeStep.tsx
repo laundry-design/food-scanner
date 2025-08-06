@@ -1,156 +1,109 @@
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { Colors } from '@/constants/Colors';
-import { FontStyles } from '@/constants/Fonts';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 
 interface AgeStepProps {
-  onAgeChange?: (age: number) => void;
+  age: number;
+  onAgeChange: (age: number) => void;
 }
 
-export default function AgeStep({ onAgeChange }: AgeStepProps) {
-  const [age, setAge] = useState(25);
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
-
-  const handleAgeChange = (newAge: number) => {
-    setAge(newAge);
-    onAgeChange?.(newAge);
-  };
-
-  const ages = Array.from({ length: 69 }, (_, i) => i + 12); // 12 to 80
+export default function AgeStep({ age, onAgeChange }: AgeStepProps) {
+  const ageRange = Array.from({ length: 65 }, (_, i) => i + 16); // 16 to 80
+  const displayRange = ageRange.slice(Math.max(0, age - 30), Math.min(ageRange.length, age + 30));
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.content}>
-        <ThemedText style={styles.title}>
-          What's your age?
-        </ThemedText>
-        
-        <View style={styles.sliderContainer}>
-          <View style={styles.valueDisplay}>
-            <ThemedText style={styles.valueText}>
-              {age}
-            </ThemedText>
-            <ThemedText style={styles.unitText}>
-              years
-            </ThemedText>
-          </View>
-          
-          <View style={styles.sliderTrack}>
-            <View style={styles.sliderFill} />
-            <View style={styles.sliderThumb} />
-          </View>
-          
-          <View style={styles.ageList}>
-            {ages.map((ageValue) => (
-              <TouchableOpacity
-                key={ageValue}
-                style={[
-                  styles.ageItem,
-                  age === ageValue && styles.selectedAgeItem
-                ]}
-                onPress={() => handleAgeChange(ageValue)}
-              >
-                <ThemedText style={[
-                  styles.ageText,
-                  age === ageValue && styles.selectedAgeText
-                ]}>
-                  {ageValue}
-                </ThemedText>
-              </TouchableOpacity>
-            ))}
-          </View>
+    <View style={styles.container}>
+      {/* Current Age Display */}
+      <View style={styles.currentAgeContainer}>
+        <Text style={styles.currentAge}>{age}</Text>
+        <View style={styles.ageIndicator}>
+          <Text style={styles.ageIndicatorText}>▲</Text>
         </View>
       </View>
-    </ThemedView>
+
+      {/* Age Slider */}
+      <View style={styles.sliderContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.sliderContent}
+          snapToInterval={40}
+          decelerationRate="fast"
+        >
+          {displayRange.map((ageValue) => (
+            <TouchableOpacity
+              key={ageValue}
+              style={[
+                styles.ageOption,
+                ageValue === age && styles.selectedAgeOption,
+              ]}
+              onPress={() => onAgeChange(ageValue)}
+            >
+              <Text
+                style={[
+                  styles.ageOptionText,
+                  ageValue === age && styles.selectedAgeOptionText,
+                ]}
+              >
+                {ageValue}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 24,
-  },
-  content: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: {
-    ...FontStyles.h1,
-    textAlign: 'center',
-    marginBottom: 48,
+  currentAgeContainer: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  currentAge: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 8,
+  },
+  ageIndicator: {
+    alignItems: 'center',
+  },
+  ageIndicatorText: {
+    fontSize: 16,
+    color: '#c4ff47',
+    fontWeight: 'bold',
   },
   sliderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
     width: '100%',
-    height: 400,
+    height: 60,
   },
-  valueDisplay: {
+  sliderContent: {
+    paddingHorizontal: 20,
     alignItems: 'center',
-    marginRight: 20,
-    minWidth: 80,
   },
-  valueText: {
-    ...FontStyles.h1,
-    fontSize: 48,
-    color: '#FFA500',
+  ageOption: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 10,
+    borderRadius: 20,
   },
-  unitText: {
-    ...FontStyles.bodyMedium,
-    color: '#666',
-    marginTop: 4,
+  selectedAgeOption: {
+    backgroundColor: '#8b7cf6',
   },
-  sliderTrack: {
-    width: 8,
-    height: 300,
-    backgroundColor: '#E5E5E5',
-    borderRadius: 4,
-    marginRight: 20,
-    position: 'relative',
+  ageOptionText: {
+    fontSize: 16,
+    color: '#ccc',
+    fontWeight: '500',
   },
-  sliderFill: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    height: '50%', // This will be calculated based on age
-    backgroundColor: '#4CAF50',
-    borderRadius: 4,
-  },
-  sliderThumb: {
-    position: 'absolute',
-    left: -6,
-    width: 20,
-    height: 20,
-    backgroundColor: '#4CAF50',
-    borderRadius: 10,
-    borderWidth: 3,
-    borderColor: '#fff',
-  },
-  ageList: {
-    flex: 1,
-    height: 300,
-    justifyContent: 'space-between',
-  },
-  ageItem: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-  },
-  selectedAgeItem: {
-    backgroundColor: '#4CAF50',
-  },
-  ageText: {
-    ...FontStyles.bodyMedium,
-    color: '#666',
-    textAlign: 'center',
-  },
-  selectedAgeText: {
-    color: '#fff',
+  selectedAgeOptionText: {
+    color: 'white',
     fontWeight: 'bold',
   },
 }); 

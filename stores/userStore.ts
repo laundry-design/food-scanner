@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { AuthUser } from './authStore';
 
 export interface User {
   id?: string;
@@ -28,6 +29,7 @@ interface UserState {
   
   // Actions
   initializeUser: () => Promise<void>;
+  syncWithAuthUser: (authUser: AuthUser) => void;
   completeOnboarding: (onboardingData: Partial<User>) => Promise<void>;
   updateUser: (updates: Partial<User>) => Promise<void>;
   resetUser: () => Promise<void>;
@@ -89,14 +91,75 @@ export const useUserStore = create<UserState>()(
         }
       },
 
+      syncWithAuthUser: (authUser: AuthUser) => {
+        const { user } = get();
+        if (user && user.id === authUser.id) {
+          // Update existing user with auth data
+          const updatedUser: User = {
+            ...user,
+            name: authUser.name,
+            email: authUser.email,
+            plan: authUser.plan || user.plan,
+            age: authUser.age || user.age,
+            weight: authUser.weight || user.weight,
+            weightUnit: authUser.weightUnit || user.weightUnit,
+            height: authUser.height || user.height,
+            heightUnit: authUser.heightUnit || user.heightUnit,
+            gender: authUser.gender || user.gender,
+            fitnessGoal: authUser.fitnessGoal || user.fitnessGoal,
+            gymActivity: authUser.gymActivity || user.gymActivity,
+            dietFocus: authUser.dietFocus || user.dietFocus,
+            isOnboardingCompleted: authUser.isOnboardingCompleted ?? user.isOnboardingCompleted,
+            updatedAt: new Date().toISOString(),
+          };
+          set({ user: updatedUser, isOnboardingCompleted: updatedUser.isOnboardingCompleted });
+        } else {
+          // Create new user from auth data
+          const newUser: User = {
+            id: authUser.id,
+            name: authUser.name,
+            email: authUser.email,
+            plan: authUser.plan || defaultUser.plan,
+            age: authUser.age || defaultUser.age,
+            weight: authUser.weight || defaultUser.weight,
+            weightUnit: authUser.weightUnit || defaultUser.weightUnit,
+            height: authUser.height || defaultUser.height,
+            heightUnit: authUser.heightUnit || defaultUser.heightUnit,
+            gender: authUser.gender || defaultUser.gender,
+            fitnessGoal: authUser.fitnessGoal || defaultUser.fitnessGoal,
+            gymActivity: authUser.gymActivity || defaultUser.gymActivity,
+            dietFocus: authUser.dietFocus || defaultUser.dietFocus,
+            isOnboardingCompleted: authUser.isOnboardingCompleted ?? false,
+            createdAt: authUser.createdAt,
+            updatedAt: new Date().toISOString(),
+          };
+          set({ user: newUser, isOnboardingCompleted: newUser.isOnboardingCompleted });
+        }
+      },
+
       completeOnboarding: async (onboardingData: Partial<User>) => {
         try {
           const { user } = get();
           if (!user) throw new Error('No user found');
 
+          // Map onboarding data to user fields
+          const mappedData = {
+            gender: onboardingData.gender,
+            age: onboardingData.age,
+            weight: onboardingData.weight,
+            weightUnit: onboardingData.weightUnit,
+            height: onboardingData.height,
+            heightUnit: onboardingData.heightUnit,
+            fitnessGoal: onboardingData.fitnessGoal,
+            gymActivity: onboardingData.gymActivity,
+            dietFocus: onboardingData.dietFocus,
+            name: onboardingData.name,
+            email: onboardingData.email,
+          };
+
           const updatedUser: User = {
             ...user,
-            ...onboardingData,
+            ...mappedData,
             isOnboardingCompleted: true,
             updatedAt: new Date().toISOString(),
           };

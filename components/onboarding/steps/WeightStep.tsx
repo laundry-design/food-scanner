@@ -1,237 +1,193 @@
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { Colors } from '@/constants/Colors';
-import { FontStyles } from '@/constants/Fonts';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 
 interface WeightStepProps {
-  onWeightChange?: (weight: number, unit: string) => void;
+  weight: number;
+  unit: 'KG' | 'LB';
+  onWeightChange: (weight: number, unit: 'KG' | 'LB') => void;
 }
 
-export default function WeightStep({ onWeightChange }: WeightStepProps) {
-  const [weight, setWeight] = useState(60);
-  const [unit, setUnit] = useState('KG');
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+export default function WeightStep({ weight, unit, onWeightChange }: WeightStepProps) {
+  const weightRange = unit === 'KG' 
+    ? Array.from({ length: 161 }, (_, i) => i + 40) // 40 to 200 KG
+    : Array.from({ length: 161 }, (_, i) => i + 88); // 88 to 440 LB
 
-  const handleWeightChange = (newWeight: number) => {
-    setWeight(newWeight);
-    onWeightChange?.(newWeight, unit);
+  const displayRange = weightRange.slice(Math.max(0, weight - 2), Math.min(weightRange.length, weight + 3));
+
+  const toggleUnit = () => {
+    const newUnit = unit === 'KG' ? 'LB' : 'KG';
+    let newWeight = weight;
+    
+    // Convert weight between units
+    if (unit === 'KG' && newUnit === 'LB') {
+      newWeight = Math.round(weight * 2.20462);
+    } else if (unit === 'LB' && newUnit === 'KG') {
+      newWeight = Math.round(weight / 2.20462);
+    }
+    
+    onWeightChange(newWeight, newUnit);
   };
-
-  const handleUnitChange = (newUnit: string) => {
-    setUnit(newUnit);
-    onWeightChange?.(weight, newUnit);
-  };
-
-  const weights = Array.from({ length: 121 }, (_, i) => i + 30); // 30 to 150
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.content}>
-        <ThemedText style={styles.title}>
-          What's your current weight?
-        </ThemedText>
-        
-        <View style={styles.unitSelector}>
-          <TouchableOpacity
+    <View style={styles.container}>
+      {/* Unit Toggle */}
+      <View style={styles.unitToggleContainer}>
+        <TouchableOpacity
+          style={[
+            styles.unitButton,
+            unit === 'KG' && styles.selectedUnitButton,
+          ]}
+          onPress={() => onWeightChange(weight, 'KG')}
+        >
+          <Text
             style={[
-              styles.unitButton,
-              unit === 'LB' && styles.selectedUnitButton
-            ]}
-            onPress={() => handleUnitChange('LB')}
-          >
-            <ThemedText style={[
               styles.unitButtonText,
-              unit === 'LB' && styles.selectedUnitButtonText
-            ]}>
-              LB
-            </ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity
+              unit === 'KG' && styles.selectedUnitButtonText,
+            ]}
+          >
+            KG
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.unitButton,
+            unit === 'LB' && styles.selectedUnitButton,
+          ]}
+          onPress={() => onWeightChange(weight, 'LB')}
+        >
+          <Text
             style={[
-              styles.unitButton,
-              unit === 'KG' && styles.selectedUnitButton
-            ]}
-            onPress={() => handleUnitChange('KG')}
-          >
-            <ThemedText style={[
               styles.unitButtonText,
-              unit === 'KG' && styles.selectedUnitButtonText
-            ]}>
-              KG
-            </ThemedText>
-          </TouchableOpacity>
-        </View>
-        
-        <View style={styles.sliderContainer}>
-          <View style={styles.valueDisplay}>
-            <ThemedText style={styles.valueText}>
-              {weight} {unit}
-            </ThemedText>
-          </View>
-          
-          <View style={styles.sliderTrack}>
-            <View style={styles.sliderFill} />
-            <View style={styles.sliderThumb} />
-          </View>
-          
-          <View style={styles.weightList}>
-            {weights.map((weightValue) => (
-              <TouchableOpacity
-                key={weightValue}
-                style={[
-                  styles.weightItem,
-                  weight === weightValue && styles.selectedWeightItem
-                ]}
-                onPress={() => handleWeightChange(weightValue)}
-              >
-                <ThemedText style={[
-                  styles.weightText,
-                  weight === weightValue && styles.selectedWeightText
-                ]}>
-                  {weightValue}
-                </ThemedText>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-        
-        <View style={styles.bmiInfo}>
-          <ThemedText style={styles.bmiTitle}>
-            Your current BMI! 16.1
-          </ThemedText>
-          <ThemedText style={styles.bmiDescription}>
-            You have a great potential to get in better shape, move now!
-          </ThemedText>
+              unit === 'LB' && styles.selectedUnitButtonText,
+            ]}
+          >
+            LB
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Current Weight Display */}
+      <View style={styles.currentWeightContainer}>
+        <Text style={styles.currentWeight}>{weight}</Text>
+        <Text style={styles.weightUnit}>{unit}</Text>
+        <View style={styles.weightIndicator}>
+          <Text style={styles.weightIndicatorText}>▲</Text>
         </View>
       </View>
-    </ThemedView>
+
+      {/* Weight Slider */}
+      <View style={styles.sliderContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.sliderContent}
+          snapToInterval={40}
+          decelerationRate="fast"
+        >
+          {displayRange.map((weightValue) => (
+            <TouchableOpacity
+              key={weightValue}
+              style={[
+                styles.weightOption,
+                weightValue === weight && styles.selectedWeightOption,
+              ]}
+              onPress={() => onWeightChange(weightValue, unit)}
+            >
+              <Text
+                style={[
+                  styles.weightOptionText,
+                  weightValue === weight && styles.selectedWeightOptionText,
+                ]}
+              >
+                {weightValue}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 24,
-  },
-  content: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: {
-    ...FontStyles.h1,
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  unitSelector: {
+  unitToggleContainer: {
     flexDirection: 'row',
-    marginBottom: 32,
-    gap: 12,
+    backgroundColor: '#333',
+    borderRadius: 25,
+    padding: 4,
+    marginBottom: 40,
   },
   unitButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    borderWidth: 2,
-    borderColor: '#E5E5E5',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
   selectedUnitButton: {
-    backgroundColor: '#FFA500',
-    borderColor: '#FFA500',
+    backgroundColor: '#c4ff47',
   },
   unitButtonText: {
-    ...FontStyles.bodyLarge,
-    color: '#666',
-    fontWeight: '600',
+    fontSize: 16,
+    color: '#ccc',
+    fontWeight: '500',
   },
   selectedUnitButtonText: {
-    color: '#fff',
-  },
-  sliderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    height: 300,
-    marginBottom: 32,
-  },
-  valueDisplay: {
-    alignItems: 'center',
-    marginRight: 20,
-    minWidth: 100,
-  },
-  valueText: {
-    ...FontStyles.h1,
-    fontSize: 48,
-    color: '#FFA500',
-  },
-  sliderTrack: {
-    width: 8,
-    height: 200,
-    backgroundColor: '#E5E5E5',
-    borderRadius: 4,
-    marginRight: 20,
-    position: 'relative',
-  },
-  sliderFill: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    height: '50%',
-    backgroundColor: '#4CAF50',
-    borderRadius: 4,
-  },
-  sliderThumb: {
-    position: 'absolute',
-    left: -6,
-    width: 20,
-    height: 20,
-    backgroundColor: '#4CAF50',
-    borderRadius: 10,
-    borderWidth: 3,
-    borderColor: '#fff',
-  },
-  weightList: {
-    flex: 1,
-    height: 200,
-    justifyContent: 'space-between',
-  },
-  weightItem: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-  },
-  selectedWeightItem: {
-    backgroundColor: '#4CAF50',
-  },
-  weightText: {
-    ...FontStyles.bodyMedium,
-    color: '#666',
-    textAlign: 'center',
-  },
-  selectedWeightText: {
-    color: '#fff',
+    color: '#333',
     fontWeight: 'bold',
   },
-  bmiInfo: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
+  currentWeightContainer: {
     alignItems: 'center',
-    width: '100%',
+    marginBottom: 40,
   },
-  bmiTitle: {
-    ...FontStyles.h4,
-    color: '#333',
+  currentWeight: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 4,
+  },
+  weightUnit: {
+    fontSize: 18,
+    color: '#ccc',
     marginBottom: 8,
   },
-  bmiDescription: {
-    ...FontStyles.bodyMedium,
-    color: '#666',
-    textAlign: 'center',
+  weightIndicator: {
+    alignItems: 'center',
+  },
+  weightIndicatorText: {
+    fontSize: 16,
+    color: '#c4ff47',
+    fontWeight: 'bold',
+  },
+  sliderContainer: {
+    width: '100%',
+    height: 60,
+  },
+  sliderContent: {
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  weightOption: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 10,
+    borderRadius: 20,
+  },
+  selectedWeightOption: {
+    backgroundColor: '#8b7cf6',
+  },
+  weightOptionText: {
+    fontSize: 16,
+    color: '#ccc',
+    fontWeight: '500',
+  },
+  selectedWeightOptionText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 }); 

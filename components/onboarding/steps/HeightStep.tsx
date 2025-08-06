@@ -1,219 +1,117 @@
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { Colors } from '@/constants/Colors';
-import { FontStyles } from '@/constants/Fonts';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 
 interface HeightStepProps {
-  onHeightChange?: (height: number, unit: string) => void;
+  height: number;
+  onHeightChange: (height: number) => void;
 }
 
-export default function HeightStep({ onHeightChange }: HeightStepProps) {
-  const [height, setHeight] = useState(170);
-  const [unit, setUnit] = useState('CM');
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
-
-  const handleHeightChange = (newHeight: number) => {
-    setHeight(newHeight);
-    onHeightChange?.(newHeight, unit);
-  };
-
-  const handleUnitChange = (newUnit: string) => {
-    setUnit(newUnit);
-    onHeightChange?.(height, newUnit);
-  };
-
-  const heights = Array.from({ length: 71 }, (_, i) => i + 140); // 140 to 210
-
-  const formatHeight = (value: number, unit: string) => {
-    if (unit === 'FT') {
-      const feet = Math.floor(value / 30.48);
-      const inches = Math.round((value % 30.48) / 2.54);
-      return `${feet}-${inches} FT`;
-    }
-    return `${value} ${unit}`;
-  };
+export default function HeightStep({ height, onHeightChange }: HeightStepProps) {
+  const heightRange = Array.from({ length: 81 }, (_, i) => i + 140); // 140 to 220 cm
+  const displayRange = heightRange.slice(Math.max(0, height - 140), Math.min(heightRange.length, height - 140 + 20));
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.content}>
-        <ThemedText style={styles.title}>
-          What's your height?
-        </ThemedText>
-        
-        <View style={styles.unitSelector}>
-          <TouchableOpacity
-            style={[
-              styles.unitButton,
-              unit === 'FT' && styles.selectedUnitButton
-            ]}
-            onPress={() => handleUnitChange('FT')}
-          >
-            <ThemedText style={[
-              styles.unitButtonText,
-              unit === 'FT' && styles.selectedUnitButtonText
-            ]}>
-              FT
-            </ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.unitButton,
-              unit === 'CM' && styles.selectedUnitButton
-            ]}
-            onPress={() => handleUnitChange('CM')}
-          >
-            <ThemedText style={[
-              styles.unitButtonText,
-              unit === 'CM' && styles.selectedUnitButtonText
-            ]}>
-              CM
-            </ThemedText>
-          </TouchableOpacity>
-        </View>
-        
-        <View style={styles.sliderContainer}>
-          <View style={styles.valueDisplay}>
-            <ThemedText style={styles.valueText}>
-              {formatHeight(height, unit)}
-            </ThemedText>
-          </View>
-          
-          <View style={styles.sliderTrack}>
-            <View style={styles.sliderFill} />
-            <View style={styles.sliderThumb} />
-          </View>
-          
-          <View style={styles.heightList}>
-            {heights.map((heightValue) => (
-              <TouchableOpacity
-                key={heightValue}
+    <View style={styles.container}>
+      {/* Current Height Display */}
+      <View style={styles.currentHeightContainer}>
+        <Text style={styles.currentHeight}>{height} cm</Text>
+      </View>
+
+      {/* Height Ruler */}
+      <View style={styles.rulerContainer}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.rulerContent}
+          snapToInterval={40}
+          decelerationRate="fast"
+        >
+          {displayRange.map((heightValue) => (
+            <TouchableOpacity
+              key={heightValue}
+              style={[
+                styles.heightMark,
+                heightValue === height && styles.selectedHeightMark,
+              ]}
+              onPress={() => onHeightChange(heightValue)}
+            >
+              <View style={styles.markLine} />
+              <Text
                 style={[
-                  styles.heightItem,
-                  height === heightValue && styles.selectedHeightItem
-                ]}
-                onPress={() => handleHeightChange(heightValue)}
-              >
-                <ThemedText style={[
                   styles.heightText,
-                  height === heightValue && styles.selectedHeightText
-                ]}>
-                  {unit === 'FT' ? formatHeight(heightValue, unit) : heightValue}
-                </ThemedText>
-              </TouchableOpacity>
-            ))}
-          </View>
+                  heightValue === height && styles.selectedHeightText,
+                ]}
+              >
+                {heightValue}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        
+        {/* Selection Indicator */}
+        <View style={styles.selectionIndicator}>
+          <Text style={styles.indicatorText}>▶</Text>
         </View>
       </View>
-    </ThemedView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 24,
-  },
-  content: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: {
-    ...FontStyles.h1,
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  unitSelector: {
-    flexDirection: 'row',
-    marginBottom: 32,
-    gap: 12,
-  },
-  unitButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    borderWidth: 2,
-    borderColor: '#E5E5E5',
-  },
-  selectedUnitButton: {
-    backgroundColor: '#FFA500',
-    borderColor: '#FFA500',
-  },
-  unitButtonText: {
-    ...FontStyles.bodyLarge,
-    color: '#666',
-    fontWeight: '600',
-  },
-  selectedUnitButtonText: {
-    color: '#fff',
-  },
-  sliderContainer: {
-    flexDirection: 'row',
+  currentHeightContainer: {
     alignItems: 'center',
-    width: '100%',
-    height: 400,
+    marginBottom: 40,
   },
-  valueDisplay: {
-    alignItems: 'center',
-    marginRight: 20,
-    minWidth: 120,
-  },
-  valueText: {
-    ...FontStyles.h1,
+  currentHeight: {
     fontSize: 48,
-    color: '#FFA500',
+    fontWeight: 'bold',
+    color: 'white',
   },
-  sliderTrack: {
-    width: 8,
+  rulerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     height: 300,
-    backgroundColor: '#E5E5E5',
-    borderRadius: 4,
-    marginRight: 20,
-    position: 'relative',
   },
-  sliderFill: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    height: '50%',
-    backgroundColor: '#4CAF50',
-    borderRadius: 4,
+  rulerContent: {
+    paddingVertical: 20,
+    alignItems: 'center',
   },
-  sliderThumb: {
-    position: 'absolute',
-    left: -6,
-    width: 20,
+  heightMark: {
+    alignItems: 'center',
+    marginVertical: 10,
+    paddingHorizontal: 20,
+  },
+  selectedHeightMark: {
+    backgroundColor: '#8b7cf6',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+  },
+  markLine: {
+    width: 2,
     height: 20,
-    backgroundColor: '#4CAF50',
-    borderRadius: 10,
-    borderWidth: 3,
-    borderColor: '#fff',
-  },
-  heightList: {
-    flex: 1,
-    height: 300,
-    justifyContent: 'space-between',
-  },
-  heightItem: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-  },
-  selectedHeightItem: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#666',
+    marginBottom: 5,
   },
   heightText: {
-    ...FontStyles.bodyMedium,
-    color: '#666',
-    textAlign: 'center',
+    fontSize: 16,
+    color: '#ccc',
+    fontWeight: '500',
   },
   selectedHeightText: {
-    color: '#fff',
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  selectionIndicator: {
+    marginLeft: 20,
+    alignItems: 'center',
+  },
+  indicatorText: {
+    fontSize: 16,
+    color: '#c4ff47',
     fontWeight: 'bold',
   },
 }); 

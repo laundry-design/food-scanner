@@ -8,6 +8,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { useColorScheme } from '@/hooks/useColorScheme';
 import SplashScreenCom from '@/components/SplashScreen';
+import AuthWrapper from '@/components/AuthWrapper';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,11 +35,13 @@ export default function RootLayout() {
   }
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
+      <AuthWrapper>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="auto" />
+      </AuthWrapper>
     </ThemeProvider>
   );
 }

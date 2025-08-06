@@ -1,0 +1,9 @@
+export { default as OnboardingIntro } from './OnboardingIntro';
+export { default as NewOnboardingFlow } from './NewOnboardingFlow';
+export { default as GenderStep } from './steps/GenderStep';
+export { default as AgeStep } from './steps/AgeStep';
+export { default as WeightStep } from './steps/WeightStep';
+export { default as HeightStep } from './steps/HeightStep';
+export { default as GoalStep } from './steps/GoalStep';
+export { default as ActivityStep } from './steps/ActivityStep';
+export { default as ProfileStep } from './steps/ProfileStep'; 
