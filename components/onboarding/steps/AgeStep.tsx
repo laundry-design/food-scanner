@@ -16,7 +16,7 @@ export default function AgeStep({ age, onAgeChange }: AgeStepProps) {
       <View style={styles.currentAgeContainer}>
         <Text style={styles.currentAge}>{age}</Text>
         <View style={styles.ageIndicator}>
-          <Text style={styles.ageIndicatorText}>▲</Text>
+          <View style={styles.triangle} />
         </View>
       </View>
 
@@ -26,7 +26,7 @@ export default function AgeStep({ age, onAgeChange }: AgeStepProps) {
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.sliderContent}
-          snapToInterval={40}
+          snapToInterval={60}
           decelerationRate="fast"
         >
           {displayRange.map((ageValue) => (
@@ -65,45 +65,58 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   currentAge: {
-    fontSize: 48,
+    fontSize: 96,
     fontWeight: 'bold',
     color: 'white',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   ageIndicator: {
     alignItems: 'center',
   },
-  ageIndicatorText: {
-    fontSize: 16,
-    color: '#c4ff47',
-    fontWeight: 'bold',
+  triangle: {
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderLeftWidth: 15,
+    borderRightWidth: 15,
+    borderBottomWidth: 20,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#7FFF00',
   },
   sliderContainer: {
     width: '100%',
-    height: 60,
+    height: 80,
+    backgroundColor: '#f67300',
+    borderRadius: 15,
+    marginBottom: 30,
   },
   sliderContent: {
     paddingHorizontal: 20,
     alignItems: 'center',
+    height: '100%',
   },
   ageOption: {
-    width: 40,
-    height: 40,
+    width: 60,
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 10,
-    borderRadius: 20,
+    marginHorizontal: 5,
   },
   selectedAgeOption: {
-    backgroundColor: '#8b7cf6',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 10,
   },
   ageOptionText: {
-    fontSize: 16,
-    color: '#ccc',
-    fontWeight: '500',
+    fontSize: 24,
+    color: '#fff',
+    opacity: 0.5,
   },
   selectedAgeOptionText: {
-    color: 'white',
+    color: '#fff',
+    fontSize: 24,
     fontWeight: 'bold',
+    opacity: 1,
   },
 }); 

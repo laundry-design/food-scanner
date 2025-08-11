@@ -12,10 +12,11 @@ export default function WeightStep({ weight, unit, onWeightChange }: WeightStepP
     ? Array.from({ length: 161 }, (_, i) => i + 40) // 40 to 200 KG
     : Array.from({ length: 161 }, (_, i) => i + 88); // 88 to 440 LB
 
-  const displayRange = weightRange.slice(Math.max(0, weight - 2), Math.min(weightRange.length, weight + 3));
+  // Ensure weight is within the valid range for the current unit
+  const clampedWeight = Math.max(weightRange[0], Math.min(weightRange[weightRange.length - 1], weight));
+  const displayRange = weightRange.slice(Math.max(0, clampedWeight - 30), Math.min(weightRange.length, clampedWeight + 30));
 
-  const toggleUnit = () => {
-    const newUnit = unit === 'KG' ? 'LB' : 'KG';
+  const handleUnitChange = (newUnit: 'KG' | 'LB') => {
     let newWeight = weight;
     
     // Convert weight between units
@@ -25,11 +26,57 @@ export default function WeightStep({ weight, unit, onWeightChange }: WeightStepP
       newWeight = Math.round(weight / 2.20462);
     }
     
-    onWeightChange(newWeight, newUnit);
+    // Ensure the converted weight is within the valid range for the new unit
+    const newWeightRange = newUnit === 'KG' 
+      ? Array.from({ length: 161 }, (_, i) => i + 40) // 40 to 200 KG
+      : Array.from({ length: 161 }, (_, i) => i + 88); // 88 to 440 LB
+    
+    const clampedNewWeight = Math.max(newWeightRange[0], Math.min(newWeightRange[newWeightRange.length - 1], newWeight));
+    
+    onWeightChange(clampedNewWeight, newUnit);
   };
 
   return (
     <View style={styles.container}>
+      {/* Current Weight Display */}
+      <View style={styles.currentWeightContainer}>
+        <Text style={styles.currentWeight}>{clampedWeight}</Text>
+        <View style={styles.weightIndicator}>
+          <View style={styles.triangle} />
+        </View>
+      </View>
+
+      {/* Weight Slider */}
+      <View style={styles.sliderContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.sliderContent}
+          snapToInterval={60}
+          decelerationRate="fast"
+        >
+          {displayRange.map((weightValue) => (
+            <TouchableOpacity
+              key={weightValue}
+              style={[
+                styles.weightOption,
+                weightValue === clampedWeight && styles.selectedWeightOption,
+              ]}
+              onPress={() => onWeightChange(weightValue, unit)}
+            >
+              <Text
+                style={[
+                  styles.weightOptionText,
+                  weightValue === clampedWeight && styles.selectedWeightOptionText,
+                ]}
+              >
+                {weightValue}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
       {/* Unit Toggle */}
       <View style={styles.unitToggleContainer}>
         <TouchableOpacity
@@ -37,7 +84,7 @@ export default function WeightStep({ weight, unit, onWeightChange }: WeightStepP
             styles.unitButton,
             unit === 'KG' && styles.selectedUnitButton,
           ]}
-          onPress={() => onWeightChange(weight, 'KG')}
+          onPress={() => handleUnitChange('KG')}
         >
           <Text
             style={[
@@ -53,7 +100,7 @@ export default function WeightStep({ weight, unit, onWeightChange }: WeightStepP
             styles.unitButton,
             unit === 'LB' && styles.selectedUnitButton,
           ]}
-          onPress={() => onWeightChange(weight, 'LB')}
+          onPress={() => handleUnitChange('LB')}
         >
           <Text
             style={[
@@ -65,46 +112,6 @@ export default function WeightStep({ weight, unit, onWeightChange }: WeightStepP
           </Text>
         </TouchableOpacity>
       </View>
-
-      {/* Current Weight Display */}
-      <View style={styles.currentWeightContainer}>
-        <Text style={styles.currentWeight}>{weight}</Text>
-        <Text style={styles.weightUnit}>{unit}</Text>
-        <View style={styles.weightIndicator}>
-          <Text style={styles.weightIndicatorText}>▲</Text>
-        </View>
-      </View>
-
-      {/* Weight Slider */}
-      <View style={styles.sliderContainer}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.sliderContent}
-          snapToInterval={40}
-          decelerationRate="fast"
-        >
-          {displayRange.map((weightValue) => (
-            <TouchableOpacity
-              key={weightValue}
-              style={[
-                styles.weightOption,
-                weightValue === weight && styles.selectedWeightOption,
-              ]}
-              onPress={() => onWeightChange(weightValue, unit)}
-            >
-              <Text
-                style={[
-                  styles.weightOptionText,
-                  weightValue === weight && styles.selectedWeightOptionText,
-                ]}
-              >
-                {weightValue}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
     </View>
   );
 }
@@ -114,6 +121,65 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  currentWeightContainer: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  currentWeight: {
+    fontSize: 96,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 10,
+  },
+  weightIndicator: {
+    alignItems: 'center',
+  },
+  triangle: {
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderLeftWidth: 15,
+    borderRightWidth: 15,
+    borderBottomWidth: 20,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#f67300',
+  },
+  sliderContainer: {
+    width: '100%',
+    height: 80,
+    backgroundColor: '#f67300',
+    borderRadius: 15,
+    marginBottom: 30,
+  },
+  sliderContent: {
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    height: '100%',
+  },
+  weightOption: {
+    width: 60,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  selectedWeightOption: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 10,
+  },
+  weightOptionText: {
+    fontSize: 24,
+    color: '#fff',
+    opacity: 0.5,
+  },
+  selectedWeightOptionText: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    opacity: 1,
   },
   unitToggleContainer: {
     flexDirection: 'row',
@@ -128,7 +194,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   selectedUnitButton: {
-    backgroundColor: '#c4ff47',
+    backgroundColor: '#f67300',
   },
   unitButtonText: {
     fontSize: 16,
@@ -137,57 +203,6 @@ const styles = StyleSheet.create({
   },
   selectedUnitButtonText: {
     color: '#333',
-    fontWeight: 'bold',
-  },
-  currentWeightContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  currentWeight: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 4,
-  },
-  weightUnit: {
-    fontSize: 18,
-    color: '#ccc',
-    marginBottom: 8,
-  },
-  weightIndicator: {
-    alignItems: 'center',
-  },
-  weightIndicatorText: {
-    fontSize: 16,
-    color: '#c4ff47',
-    fontWeight: 'bold',
-  },
-  sliderContainer: {
-    width: '100%',
-    height: 60,
-  },
-  sliderContent: {
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  weightOption: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginHorizontal: 10,
-    borderRadius: 20,
-  },
-  selectedWeightOption: {
-    backgroundColor: '#8b7cf6',
-  },
-  weightOptionText: {
-    fontSize: 16,
-    color: '#ccc',
-    fontWeight: '500',
-  },
-  selectedWeightOptionText: {
-    color: 'white',
     fontWeight: 'bold',
   },
 }); 

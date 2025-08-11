@@ -116,8 +116,13 @@ export default function NewOnboardingFlow({ onComplete }: NewOnboardingFlowProps
         dietFocus: '',
         name: onboardingData.fullName,
         email: onboardingData.email,
+        goal: onboardingData.goal,
+        activityLevel: onboardingData.activityLevel,
+        fullName: onboardingData.fullName,
+        nickname: onboardingData.nickname,
+        phone: onboardingData.phone,
       };
-      onComplete(mappedData);
+      onComplete(mappedData as any);
     }
   };
 
@@ -239,24 +244,6 @@ export default function NewOnboardingFlow({ onComplete }: NewOnboardingFlowProps
             <Text style={styles.backButtonText}>← Back</Text>
           </TouchableOpacity>
         )}
-        <View style={styles.progressContainer}>
-          <Text style={styles.progressText}>
-            {currentStep + 1}.{currentStep} {STEPS[currentStep].id.replace('_', ' ')}
-          </Text>
-        </View>
-      </View>
-
-      {/* Progress Dots */}
-      <View style={styles.dotsContainer}>
-        {STEPS.map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.dot,
-              index === currentStep ? styles.activeDot : styles.inactiveDot,
-            ]}
-          />
-        ))}
       </View>
 
       {/* Progress Indicator with Ship */}
@@ -265,8 +252,12 @@ export default function NewOnboardingFlow({ onComplete }: NewOnboardingFlowProps
         totalSteps={STEPS.length} 
       />
 
-      {/* Content */}
-      <View style={styles.content}>
+      {/* Scrollable Content */}
+      <ScrollView 
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={styles.title}>{STEPS[currentStep].title}</Text>
         <Text style={styles.description}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
@@ -275,9 +266,9 @@ export default function NewOnboardingFlow({ onComplete }: NewOnboardingFlowProps
         <Animated.View style={[styles.stepContent, popAnimatedStyle]}>
           {renderStep()}
         </Animated.View>
-      </View>
+      </ScrollView>
 
-      {/* Footer */}
+      {/* Sticky Footer */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={[
@@ -313,7 +304,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   backButtonText: {
-    color: '#c4ff47',
+    color: '#FFA500',
     fontSize: 16,
     fontWeight: '500',
   },
@@ -327,9 +318,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     textTransform: 'capitalize',
   },
-  content: {
+  scrollContainer: {
     flex: 1,
+  },
+  scrollContent: {
     paddingHorizontal: 20,
+    paddingBottom: 100, // Add padding to the bottom to make space for the sticky footer
   },
   title: {
     fontSize: 24,
@@ -349,11 +343,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     paddingHorizontal: 20,
     paddingBottom: 40,
+    backgroundColor: '#2a2a2a', // Match container background
   },
   continueButton: {
-    backgroundColor: '#333',
+    backgroundColor: '#FFA500', // Orange background
     borderRadius: 25,
     paddingVertical: 16,
     alignItems: 'center',
@@ -362,7 +361,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   continueButtonText: {
-    color: 'white',
+    color: 'white', // White text
     fontSize: 16,
     fontWeight: '600',
   },

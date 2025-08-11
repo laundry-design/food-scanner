@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import Header from '@/components/Header';
 
 interface DietCardProps {
   image: string;
@@ -88,13 +89,12 @@ export default function DietsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Header title="Diets" backgroundColor="#000000" />
       <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <Text style={styles.header}>Diets</Text>
 
         {/* Toggle */}
         <View style={styles.toggleContainer}>
@@ -165,12 +165,7 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 120, // Extra padding for bottom navigation
   },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: 16,
-  },
+
   toggleContainer: {
     flexDirection: 'row',
     backgroundColor: '#ffffff',
