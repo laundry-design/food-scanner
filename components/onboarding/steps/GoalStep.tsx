@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
     borderColor: '#444',
   },
   selectedOptionButton: {
-    backgroundColor: '#8b7cf6',
-    borderColor: '#8b7cf6',
+    backgroundColor: '#f67300',
+    borderColor: '#f67300',
   },
   optionContent: {
     flex: 1,

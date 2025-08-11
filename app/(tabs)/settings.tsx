@@ -2,6 +2,8 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useAppStores } from '@/hooks/useAppStores';
 import { Alert, StyleSheet, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Header from '@/components/Header';
 
 export default function SettingsScreen() {
   const { user, resetAndStartOnboarding } = useAppStores();
@@ -47,8 +49,10 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText style={styles.title}>Settings</ThemedText>
+    <SafeAreaView style={styles.container}>
+      <Header title="Settings" />
+      <ThemedView style={styles.container}>
+        <ThemedText style={styles.title}>Settings</ThemedText>
       
       <ThemedView style={styles.section}>
         <ThemedText style={styles.sectionTitle}>User Information</ThemedText>
@@ -77,7 +81,8 @@ export default function SettingsScreen() {
           <ThemedText style={styles.buttonText}>Clear All User Data</ThemedText>
         </TouchableOpacity>
       </ThemedView>
-    </ThemedView>
+      </ThemedView>
+    </SafeAreaView>
   );
 }
 
