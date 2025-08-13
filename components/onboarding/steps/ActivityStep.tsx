@@ -7,9 +7,9 @@ interface ActivityStepProps {
 }
 
 const activities = [
-  { value: 'beginner', label: 'Beginner', style: 'white_rounded' },
-  { value: 'intermediate', label: 'Intermediate', style: 'outline_rounded' },
-  { value: 'advance', label: 'Advance', style: 'accent_rounded' },
+  { value: 'beginner', label: 'Beginner' },
+  { value: 'intermediate', label: 'Intermediate' },
+  { value: 'advance', label: 'Advance' },
 ];
 
 export default function ActivityStep({ selectedActivity, onSelect }: ActivityStepProps) {
@@ -17,34 +17,14 @@ export default function ActivityStep({ selectedActivity, onSelect }: ActivitySte
     if (selectedActivity === activity.value) {
       return styles.selectedActivityButton;
     }
-    
-    switch (activity.style) {
-      case 'white_rounded':
-        return styles.whiteButton;
-      case 'outline_rounded':
-        return styles.outlineButton;
-      case 'accent_rounded':
-        return styles.accentButton;
-      default:
-        return styles.whiteButton;
-    }
+    return styles.defaultButton;
   };
 
   const getTextStyle = (activity: typeof activities[0]) => {
     if (selectedActivity === activity.value) {
       return styles.selectedActivityText;
     }
-    
-    switch (activity.style) {
-      case 'white_rounded':
-        return styles.whiteButtonText;
-      case 'outline_rounded':
-        return styles.outlineButtonText;
-      case 'accent_rounded':
-        return styles.accentButtonText;
-      default:
-        return styles.whiteButtonText;
-    }
+    return styles.defaultButtonText;
   };
 
   return (
@@ -89,35 +69,21 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
   },
-  whiteButton: {
-    backgroundColor: 'white',
-  },
-  outlineButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#666',
-  },
-  accentButton: {
-    backgroundColor: '#c4ff47',
+  defaultButton: {
+    backgroundColor: '#333333',
   },
   selectedActivityButton: {
-    backgroundColor: '#c4ff47',
+    backgroundColor: '#f67300',
   },
   activityLabel: {
     fontSize: 16,
     fontWeight: '600',
   },
-  whiteButtonText: {
-    color: '#333',
-  },
-  outlineButtonText: {
-    color: '#666',
-  },
-  accentButtonText: {
-    color: '#333',
+  defaultButtonText: {
+    color: 'white',
   },
   selectedActivityText: {
-    color: '#333',
+    color: 'white',
     fontWeight: 'bold',
   },
 }); 

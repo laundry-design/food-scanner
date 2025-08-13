@@ -58,16 +58,13 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Header title="Home" />
       <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
         bounces={true}
       >
-        <Header 
-          userName="Alex" 
-          onProfilePress={handleProfilePress}
-        />
         <DailyQuote quoteData={dailyQuote} />
         <MacroOverview macroData={macroData} />
         <DietSuggestions suggestions={dietSuggestions} />

@@ -88,6 +88,12 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
+          name="notifications"
+          options={{
+            href: null, // Hide this tab from the tab bar
+          }}
+        />
+        <Tabs.Screen
           name="diet-detail"
           options={{
             href: null, // Hide this tab from the tab bar

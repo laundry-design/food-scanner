@@ -3,12 +3,12 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
-  Header,
   NutritionAnalysisCard,
   TimeRangeSelector,
   CalorieTrendsCard,
   MacroDistributionCard,
 } from '@/components/analytics';
+import Header from '@/components/Header';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { TimeRange, CalorieData, MacroData } from '@/types/nutrition';
@@ -30,12 +30,12 @@ export default function AnalyticsScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: '#000000' }]}>
+      <Header title="Analytics" backgroundColor="#000000" />
       <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Header title="Analysis" />
         <NutritionAnalysisCard />
         <TimeRangeSelector 
           selected={selectedTimeRange}
