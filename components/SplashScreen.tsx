@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Image, StyleSheet, Animated, Dimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from './ThemedText';
 import { Fonts, FontStyles } from '@/constants/Fonts';
 
@@ -77,30 +78,36 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Animated.View
-        style={[
-          styles.content,
-          {
-            opacity: fadeAnim,
-            transform: [{ scale: scaleAnim }],
-          },
-        ]}
-      >
-<ThemedText style={styles.title}>Eating</ThemedText>
-        <ThemedText style={styles.subtitle}>made easy</ThemedText>
-<View style={styles.contentSection}/> 
- <Image
-          source={require('../assets/images/splash/luffy_fat.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </Animated.View>
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Animated.View
+          style={[
+            styles.content,
+            {
+              opacity: fadeAnim,
+              transform: [{ scale: scaleAnim }],
+            },
+          ]}
+        >
+  <ThemedText style={styles.title}>Eating</ThemedText>
+          <ThemedText style={styles.subtitle}>made easy</ThemedText>
+  <View style={styles.contentSection}/> 
+   <Image
+            source={require('../assets/images/splash/luffy_fat.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </Animated.View>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
   container: {
     flex: 1,
     backgroundColor: '#ffffff',

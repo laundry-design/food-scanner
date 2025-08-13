@@ -2,6 +2,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useAppStores } from '@/hooks/useAppStores';
 import { Alert, StyleSheet, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
   const { user, resetAndStartOnboarding } = useAppStores();
@@ -47,41 +48,47 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText style={styles.title}>Settings</ThemedText>
-      
-      <ThemedView style={styles.section}>
-        <ThemedText style={styles.sectionTitle}>User Information</ThemedText>
-        {user && (
-          <ThemedView style={styles.userInfo}>
-            <ThemedText style={styles.infoText}>User ID: {user.id}</ThemedText>
-            <ThemedText style={styles.infoText}>Plan: {user.plan}</ThemedText>
-            <ThemedText style={styles.infoText}>Age: {user.age}</ThemedText>
-            <ThemedText style={styles.infoText}>Gender: {user.gender}</ThemedText>
-            <ThemedText style={styles.infoText}>Fitness Goal: {user.fitnessGoal}</ThemedText>
-            <ThemedText style={styles.infoText}>Onboarding Completed: {user.isOnboardingCompleted ? 'Yes' : 'No'}</ThemedText>
-            <ThemedText style={styles.infoText}>Created: {new Date(user.createdAt).toLocaleDateString()}</ThemedText>
-            <ThemedText style={styles.infoText}>Last Updated: {new Date(user.updatedAt).toLocaleDateString()}</ThemedText>
-          </ThemedView>
-        )}
-      </ThemedView>
+    <SafeAreaView style={styles.safeArea}>
+      <ThemedView style={styles.container}>
+        <ThemedText style={styles.title}>Settings</ThemedText>
+        
+        <ThemedView style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>User Information</ThemedText>
+          {user && (
+            <ThemedView style={styles.userInfo}>
+              <ThemedText style={styles.infoText}>User ID: {user.id}</ThemedText>
+              <ThemedText style={styles.infoText}>Plan: {user.plan}</ThemedText>
+              <ThemedText style={styles.infoText}>Age: {user.age}</ThemedText>
+              <ThemedText style={styles.infoText}>Gender: {user.gender}</ThemedText>
+              <ThemedText style={styles.infoText}>Fitness Goal: {user.fitnessGoal}</ThemedText>
+              <ThemedText style={styles.infoText}>Onboarding Completed: {user.isOnboardingCompleted ? 'Yes' : 'No'}</ThemedText>
+              <ThemedText style={styles.infoText}>Created: {new Date(user.createdAt).toLocaleDateString()}</ThemedText>
+              <ThemedText style={styles.infoText}>Last Updated: {new Date(user.updatedAt).toLocaleDateString()}</ThemedText>
+            </ThemedView>
+          )}
+        </ThemedView>
 
-      <ThemedView style={styles.section}>
-        <ThemedText style={styles.sectionTitle}>Actions</ThemedText>
-        
-        <TouchableOpacity style={styles.button} onPress={handleResetOnboarding}>
-          <ThemedText style={styles.buttonText}>Reset Onboarding</ThemedText>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={[styles.button, styles.dangerButton]} onPress={handleClearUserData}>
-          <ThemedText style={styles.buttonText}>Clear All User Data</ThemedText>
-        </TouchableOpacity>
+        <ThemedView style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>Actions</ThemedText>
+          
+          <TouchableOpacity style={styles.button} onPress={handleResetOnboarding}>
+            <ThemedText style={styles.buttonText}>Reset Onboarding</ThemedText>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={[styles.button, styles.dangerButton]} onPress={handleClearUserData}>
+            <ThemedText style={styles.buttonText}>Clear All User Data</ThemedText>
+          </TouchableOpacity>
+        </ThemedView>
       </ThemedView>
-    </ThemedView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#1a1a1a', // Match your app's background
+  },
   container: {
     flex: 1,
     padding: 20,

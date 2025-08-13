@@ -101,10 +101,12 @@ export default function TabLayout() {
         />
       </Tabs>
       
-      <BottomNavigation 
-        activeTab={activeTab}
-        onTabPress={handleTabPress}
-      />
+      {activeTab !== 'camera' && (
+        <BottomNavigation 
+          activeTab={activeTab}
+          onTabPress={handleTabPress}
+        />
+      )}
     </View>
   );
 }
