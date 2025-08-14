@@ -1,21 +1,8 @@
 import React from 'react';
 import BottomSheet from '@/components/BottomSheet';
 import { NutritionMetrics } from '@/components/camera';
-
-interface NutritionData {
-  calories: { value: string; progress: number; color: string };
-  protein: { value: string; progress: number; color: string };
-  carbs: { value: string; progress: number; color: string };
-  fat: { value: string; progress: number; color: string };
-}
-
-interface DietData {
-  id: string;
-  title: string;
-  description: string;
-  nutrition: NutritionData;
-  goal: string;
-}
+import { useDietStore, DietData } from '@/stores/dietStore';
+import { useUserStore } from '@/stores/userStore';
 
 interface DietBottomSheetProps {
   isVisible: boolean;
@@ -23,7 +10,6 @@ interface DietBottomSheetProps {
   dietData: DietData | null;
   isExpanded: boolean;
   onExpansionChange: (expanded: boolean) => void;
-  onAddToDiet: () => void;
 }
 
 export default function DietBottomSheet({
@@ -32,8 +18,23 @@ export default function DietBottomSheet({
   dietData,
   isExpanded,
   onExpansionChange,
-  onAddToDiet,
 }: DietBottomSheetProps) {
+  const { addDietToUser, isLoading } = useDietStore();
+  const { user } = useUserStore();
+
+  const handleAddToDiet = async () => {
+    if (!dietData || !user?.id) return;
+    
+    try {
+      await addDietToUser(dietData.id, user.id);
+      // You can add a success toast/notification here
+      console.log('Diet added successfully!');
+    } catch (error) {
+      console.error('Failed to add diet:', error);
+      // You can add an error toast/notification here
+    }
+  };
+
   if (!dietData) return null;
 
   return (
@@ -49,7 +50,8 @@ export default function DietBottomSheet({
       <NutritionMetrics
         dietData={dietData}
         isExpanded={isExpanded}
-        onAddToDiet={onAddToDiet}
+        onAddToDiet={handleAddToDiet}
+        isLoading={isLoading}
       />
     </BottomSheet>
   );

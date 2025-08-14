@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View, Text, TouchableOpacity, Image, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { ScrollView, StyleSheet, View, Text, TouchableOpacity, Image, Platform, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Header from '@/components/Header';
@@ -7,34 +7,40 @@ import { Colors } from '@/constants/Colors';
 import { Feather } from '@expo/vector-icons';
 import BottomSheet from '@/components/BottomSheet';
 import { DietBottomSheet } from '@/components/diet';
+import { useDiet } from '@/hooks/useDiet';
+import { DietData } from '@/stores/dietStore';
 
 interface DietCardProps {
-  image: string;
-  title: string;
-  nutrition: {
-    calories: string;
-    protein: string;
-    carbs: string;
-    fat: string;
-  };
+  diet: DietData;
   onPress: () => void;
 }
 
-function DietCard({ image, title, nutrition, onPress }: DietCardProps) {
+function DietCard({ diet, onPress }: DietCardProps) {
+  // Use a placeholder image if none provided
+  const imageUri = diet.imageUrl || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop';
+  
   return (
     <TouchableOpacity style={styles.shadowWrapper} onPress={onPress} activeOpacity={0.85}>
       <View style={styles.dietCard}>
-        <Image source={{ uri: image }} style={styles.dietImage} />
+        <Image source={{ uri: imageUri }} style={styles.dietImage} />
         <View style={styles.dietInfo}>
-          <Text style={styles.dietTitle}>{title}</Text>
+          <Text style={styles.dietTitle}>{diet.title}</Text>
+          <Text style={styles.dietDescription} numberOfLines={2}>{diet.description}</Text>
           <View style={styles.nutritionRow}>
-            <Text style={styles.nutritionText}>{nutrition.calories}</Text>
+            <Text style={styles.nutritionText}>{diet.nutrition.calories.value}</Text>
             <Text style={styles.separator}>•</Text>
-            <Text style={styles.nutritionText}>Protein: {nutrition.protein}</Text>
+            <Text style={styles.nutritionText}>Protein: {diet.nutrition.protein.value}</Text>
             <Text style={styles.separator}>•</Text>
-            <Text style={styles.nutritionText}>Carbs: {nutrition.carbs}</Text>
+            <Text style={styles.nutritionText}>Carbs: {diet.nutrition.carbs.value}</Text>
             <Text style={styles.separator}>•</Text>
-            <Text style={styles.nutritionText}>Fat: {nutrition.fat}</Text>
+            <Text style={styles.nutritionText}>Fat: {diet.nutrition.fat.value}</Text>
+          </View>
+          <View style={styles.tagsContainer}>
+            {diet.tags.slice(0, 3).map((tag, index) => (
+              <View key={index} style={styles.tag}>
+                <Text style={styles.tagText}>{tag}</Text>
+              </View>
+            ))}
           </View>
         </View>
       </View>
@@ -46,77 +52,22 @@ export default function DietsScreen() {
   const [selectedToggle, setSelectedToggle] = useState<'All Diets' | 'My Diets'>('All Diets');
   const [showBottomSheet, setShowBottomSheet] = useState(true);
   const [showDietBottomSheet, setShowDietBottomSheet] = useState(false);
-  const [selectedDiet, setSelectedDiet] = useState<any>(null);
+  const [selectedDiet, setSelectedDiet] = useState<DietData | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const dietPlans = [
-    {
-      id: '1',
-      image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&h=300&fit=crop',
-      title: 'Mediterranean Lifestyle',
-      nutrition: {
-        calories: '2,000 kcal',
-        protein: '120g',
-        carbs: '200g',
-        fat: '70g'
-      }
-    },
-    {
-      id: '2',
-      image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop',
-      title: 'Keto Diet',
-      nutrition: {
-        calories: '1,800 kcal',
-        protein: '140g',
-        carbs: '50g',
-        fat: '120g'
-      }
-    },
-    {
-      id: '3',
-      image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=300&fit=crop',
-      title: 'Vegetarian Plan',
-      nutrition: {
-        calories: '1,900 kcal',
-        protein: '90g',
-        carbs: '250g',
-        fat: '65g'
-      }
-    }
-  ];
+  // Use the diet hook
+  const { diets, userDiets, isLoading, error, getDiets } = useDiet();
 
-  const handleDietPress = (diet: any) => {
-    // Transform diet data to match the expected format
-    const transformedDiet = {
-      id: diet.id,
-      title: diet.title,
-      description: `A comprehensive ${diet.title.toLowerCase()} plan designed to help you achieve your health and wellness goals with balanced nutrition.`,
-      nutrition: {
-        calories: { 
-          value: diet.nutrition.calories, 
-          progress: 0.75, 
-          color: '#FFE5B4' 
-        },
-        protein: { 
-          value: diet.nutrition.protein, 
-          progress: 0.85, 
-          color: '#E5F3FF' 
-        },
-        carbs: { 
-          value: diet.nutrition.carbs, 
-          progress: 0.65, 
-          color: '#F0FFF0' 
-        },
-        fat: { 
-          value: diet.nutrition.fat, 
-          progress: 0.70, 
-          color: '#FFF0F5' 
-        }
-      },
-      goal: `Follow the ${diet.title} to maintain a balanced lifestyle with optimal nutrition and sustainable eating habits.`
-    };
-    
-    setSelectedDiet(transformedDiet);
+  useEffect(() => {
+    // Initialize diets when component mounts
+    getDiets();
+  }, []);
+
+  // Get the diets to display based on selected toggle
+  const displayedDiets = selectedToggle === 'All Diets' ? diets : userDiets;
+
+  const handleDietPress = (diet: DietData) => {
+    setSelectedDiet(diet);
     setShowDietBottomSheet(true);
     setShowBottomSheet(false); // Hide the main bottom sheet
   };
@@ -132,11 +83,7 @@ export default function DietsScreen() {
     setIsExpanded(expanded);
   };
 
-  const handleAddToDiet = () => {
-    // Handle adding diet to user's plan
-    console.log('Adding diet to plan:', selectedDiet?.title);
-    // You can add your logic here
-  };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -188,15 +135,51 @@ export default function DietsScreen() {
         </View>
 
         {/* Diets Section */}
-        <Text style={styles.sectionTitle}>Diets</Text>
+        <Text style={styles.sectionTitle}>
+          {selectedToggle === 'All Diets' ? 'All Diets' : 'My Diets'}
+        </Text>
+
+        {/* Loading State */}
+        {isLoading && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.light.primaryColor} />
+            <Text style={styles.loadingText}>Loading diets...</Text>
+          </View>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity style={styles.retryButton} onPress={getDiets}>
+              <Text style={styles.retryButtonText}>Retry</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && !error && displayedDiets.length === 0 && (
+          <View style={styles.emptyContainer}>
+            <Feather name="inbox" size={48} color="#ccc" />
+            <Text style={styles.emptyText}>
+              {selectedToggle === 'All Diets' 
+                ? 'No diets available' 
+                : 'No diets in your list yet'
+              }
+            </Text>
+            {selectedToggle === 'My Diets' && (
+              <Text style={styles.emptySubtext}>
+                Browse all diets and add some to your list!
+              </Text>
+            )}
+          </View>
+        )}
 
         {/* Diet Cards */}
-        {dietPlans.map((diet) => (
+        {!isLoading && !error && displayedDiets.map((diet) => (
           <DietCard
             key={diet.id}
-            image={diet.image}
-            title={diet.title}
-            nutrition={diet.nutrition}
+            diet={diet}
             onPress={() => handleDietPress(diet)}
           />
         ))}
@@ -255,9 +238,8 @@ export default function DietsScreen() {
         isVisible={showDietBottomSheet}
         onClose={handleCloseDietBottomSheet}
         dietData={selectedDiet}
-        isExpanded={isExpanded}
+        isExpanded={true}
         onExpansionChange={handleExpansionChange}
-        onAddToDiet={handleAddToDiet}
       />
     </SafeAreaView>
   );
@@ -440,5 +422,76 @@ paddingLeft: 8,
     fontSize: 12,
     color: Colors.light.text,
     marginHorizontal: 4,
+  },
+  dietDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+    lineHeight: 18,
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 8,
+    gap: 6,
+  },
+  tag: {
+    backgroundColor: Colors.light.primaryLight,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  tagText: {
+    fontSize: 10,
+    color: Colors.light.text,
+    fontWeight: '500',
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: Colors.light.text,
+  },
+  errorContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#ff4444',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: Colors.light.primaryColor,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#999',
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#ccc',
+    marginTop: 8,
+    textAlign: 'center',
   },
 });

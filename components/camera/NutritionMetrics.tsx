@@ -22,9 +22,10 @@ interface NutritionMetricsProps {
   dietData: DietData;
   isExpanded: boolean;
   onAddToDiet: () => void;
+  isLoading?: boolean;
 }
 
-export default function NutritionMetrics({ dietData, isExpanded, onAddToDiet }: NutritionMetricsProps) {
+export default function NutritionMetrics({ dietData, isExpanded, onAddToDiet, isLoading = false }: NutritionMetricsProps) {
   return (
     <>
       {/* Nutrition Cards Grid - Always visible when image selected */}
@@ -75,11 +76,14 @@ export default function NutritionMetrics({ dietData, isExpanded, onAddToDiet }: 
 
           {/* CTA Button */}
           <TouchableOpacity 
-            style={styles.ctaButton}
+            style={[styles.ctaButton, isLoading && styles.ctaButtonDisabled]}
             onPress={onAddToDiet}
             activeOpacity={0.8}
+            disabled={isLoading}
           >
-            <Text style={styles.ctaButtonText}>Add to My Diet</Text>
+            <Text style={styles.ctaButtonText}>
+              {isLoading ? 'Adding...' : 'Add to My Diet'}
+            </Text>
           </TouchableOpacity>
         </>
       )}
@@ -145,5 +149,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#ffffff',
+  },
+  ctaButtonDisabled: {
+    backgroundColor: '#d1d5db',
+    opacity: 0.7,
   },
 });
