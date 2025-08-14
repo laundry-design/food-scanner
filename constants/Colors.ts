@@ -1,27 +1,30 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
 
 export const Colors = {
   primary: '#0a7ea4',
   light: {
-    text: '#11181C',
-    background: '#fff',
+    text: '#1A1A1A', // Deep charcoal for high readability
+    background: '#ffffff',
     tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
+    icon: '#555555', // Muted gray icons
+    tabIconDefault: '#9E9E9E',
     tabIconSelected: tintColorLight,
+    primaryColor: '#f97316', // Orange
+    primaryLight: '#ffd6b4',
+    primaryTextOnPrimary: '#ffffff', // White text on orange
+    secondaryText: '#4B5563', // Slightly muted gray for less emphasis
   },
   dark: {
-    text: '#ECEDEE',
+    text: '#F5F5F5', // Soft white for comfort
     background: '#151718',
     tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
+    icon: '#B0B0B0',
+    tabIconDefault: '#B0B0B0',
     tabIconSelected: tintColorDark,
+    primaryColor: '#f97316',
+    primaryLight: '#ffd6b4',
+    primaryTextOnPrimary: '#ffffff', // Still white text on orange
+    secondaryText: '#D1D5DB', // Muted light gray
   },
 };

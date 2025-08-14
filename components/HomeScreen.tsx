@@ -7,6 +7,7 @@ import DailyQuote from './DailyQuote';
 import MacroOverview from './MacroOverview';
 import DietSuggestions from './DietSuggestions';
 import { DailyQuoteData, MacroData, DietSuggestion } from '@/types/home';
+import { Colors } from '@/constants/Colors';
 
 export default function HomeScreen() {
   console.log('HomeScreen component rendered');
@@ -29,7 +30,7 @@ export default function HomeScreen() {
       title: 'Increase Protein Intake',
       description: "You're 50% below your protein goal. Try adding lean meats, eggs, or protein shakes.",
       actionText: 'View Foods',
-      gradientColors: ['#22c55e', '#16a34a'],
+      gradientColors: [Colors.light.primaryLight],
       priority: 1
     },
     {
@@ -38,7 +39,7 @@ export default function HomeScreen() {
       title: 'Stay Hydrated',
       description: 'Drink at least 8 glasses of water today to support your metabolism.',
       actionText: 'Set Reminder',
-      gradientColors: ['#3b82f6', '#2563eb'],
+gradientColors: [Colors.light.primaryLight],
       priority: 2
     },
     {
@@ -47,7 +48,7 @@ export default function HomeScreen() {
       title: 'Meal Timing',
       description: 'Try eating smaller, frequent meals to maintain steady energy levels.',
       actionText: 'Plan Meals',
-      gradientColors: ['#8b5cf6', '#7c3aed'],
+ gradientColors: [Colors.light.primaryLight],
       priority: 3
     }
   ];
@@ -64,6 +65,7 @@ export default function HomeScreen() {
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
         bounces={true}
+
       >
         <DailyQuote quoteData={dailyQuote} />
         <MacroOverview macroData={macroData} />
@@ -76,7 +78,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: Colors.light.background,
   },
   scrollView: {
     flex: 1,
