@@ -136,15 +136,7 @@ export default function DietDetailScreen() {
       </ScrollView>
 
       {/* CTA Button */}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity 
-          style={styles.ctaButton}
-          onPress={handleAddToDiet}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.ctaButtonText}>Add to My Diet</Text>
-        </TouchableOpacity>
-      </View>
+      
     </SafeAreaView>
   );
 }
