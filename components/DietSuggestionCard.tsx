@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { DietSuggestionProps } from '@/types/home';
 import GradientView from './GradientView';
+import { Colors } from '@/constants/Colors';
 
 const DietSuggestionCard: React.FC<DietSuggestionProps> = ({
   icon,
@@ -19,7 +20,7 @@ const DietSuggestionCard: React.FC<DietSuggestionProps> = ({
         style={styles.gradient}
       >
         <View style={styles.header}>
-          <Ionicons name={icon as keyof typeof Ionicons.glyphMap} size={20} color="#ffffff" />
+          <Ionicons name={icon as keyof typeof Ionicons.glyphMap} size={20} color={Colors.light.primaryColor} />
           <Text style={styles.title}>{title}</Text>
         </View>
         
@@ -54,18 +55,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#ffffff',
+    color: Colors.light.text,
     marginLeft: 8,
     flex: 1,
   },
   description: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: Colors.light.secondaryText,
     lineHeight: 20,
     marginBottom: 12,
   },
   actionButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: Colors.light.primaryColor,
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,

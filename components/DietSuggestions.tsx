@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import DietSuggestionCard from './DietSuggestionCard';
 import { DietSuggestion } from '@/types/home';
+import { Colors } from '@/constants/Colors';
 
 interface DietSuggestionsProps {
   suggestions: DietSuggestion[];
@@ -48,12 +49,14 @@ const DietSuggestions: React.FC<DietSuggestionsProps> = ({ suggestions }) => {
 const styles = StyleSheet.create({
   container: {
     marginBottom: 24,
+marginTop: 4,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#ffffff',
-    marginBottom: 16,
+    fontSize: 18,
+       fontWeight: '600',
+       color: Colors .light.text,
+       marginBottom: 16,
+       paddingLeft: 8,
   },
 });
 

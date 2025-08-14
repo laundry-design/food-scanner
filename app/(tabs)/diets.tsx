@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
+import { ScrollView, StyleSheet, View, Text, TouchableOpacity, Image, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Header from '@/components/Header';
+import { Colors } from '@/constants/Colors';
 
 interface DietCardProps {
   image: string;
@@ -30,18 +31,20 @@ function DietCard({ image, title, nutrition }: DietCardProps) {
   };
 
   return (
-    <TouchableOpacity style={styles.dietCard} onPress={handlePress} activeOpacity={0.8}>
-      <Image source={{ uri: image }} style={styles.dietImage} />
-      <View style={styles.dietInfo}>
-        <Text style={styles.dietTitle}>{title}</Text>
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionText}>{nutrition.calories}</Text>
-          <Text style={styles.separator}>•</Text>
-          <Text style={styles.nutritionText}>Protein: {nutrition.protein}</Text>
-          <Text style={styles.separator}>•</Text>
-          <Text style={styles.nutritionText}>Carbs: {nutrition.carbs}</Text>
-          <Text style={styles.separator}>•</Text>
-          <Text style={styles.nutritionText}>Fat: {nutrition.fat}</Text>
+    <TouchableOpacity style={styles.shadowWrapper} onPress={handlePress} activeOpacity={0.85}>
+      <View style={styles.dietCard}>
+        <Image source={{ uri: image }} style={styles.dietImage} />
+        <View style={styles.dietInfo}>
+          <Text style={styles.dietTitle}>{title}</Text>
+          <View style={styles.nutritionRow}>
+            <Text style={styles.nutritionText}>{nutrition.calories}</Text>
+            <Text style={styles.separator}>•</Text>
+            <Text style={styles.nutritionText}>Protein: {nutrition.protein}</Text>
+            <Text style={styles.separator}>•</Text>
+            <Text style={styles.nutritionText}>Carbs: {nutrition.carbs}</Text>
+            <Text style={styles.separator}>•</Text>
+            <Text style={styles.nutritionText}>Fat: {nutrition.fat}</Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -90,7 +93,7 @@ export default function DietsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Header title="Diets" backgroundColor="#000000" />
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -156,20 +159,22 @@ export default function DietsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: Colors.light.background,
+
   },
   scrollView: {
     flex: 1,
+paddingHorizontal: 2,
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 120, // Extra padding for bottom navigation
+    paddingBottom: 120,
   },
 
   toggleContainer: {
     flexDirection: 'row',
-    backgroundColor: '#ffffff',
-    borderRadius: 25,
+    backgroundColor: Colors.light.primaryLight,
+    borderRadius: 12,
     padding: 4,
     marginBottom: 16,
   },
@@ -177,11 +182,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 21,
+    borderRadius: 12,
     alignItems: 'center',
   },
   activeToggleOption: {
-    backgroundColor: '#f97316',
+    backgroundColor: Colors.light.primaryColor,
   },
   toggleText: {
     fontSize: 14,
@@ -192,13 +197,13 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   exploreCard: {
-    backgroundColor: '#e9d5ff',
+    backgroundColor: Colors.light.primaryLight,
     padding: 16,
     borderRadius: 12,
     marginBottom: 24,
   },
   exploreTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#000000',
     marginBottom: 4,
@@ -211,13 +216,35 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#ffffff',
+    color: Colors.light.text,
+paddingLeft: 8,
     marginBottom: 8,
   },
-  dietCard: {
+
+  // Wrapper for shadow (keeps shadow visible)
+  shadowWrapper: {
+    borderRadius: 12,
     marginBottom: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 6 },
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
+  },
+
+  // Card itself (keeps rounded corners & hides image overflow)
+  dietCard: {
     borderRadius: 12,
     overflow: 'hidden',
+    backgroundColor: Colors.light.background,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.05)',
   },
   dietImage: {
     width: '100%',
@@ -226,11 +253,12 @@ const styles = StyleSheet.create({
   },
   dietInfo: {
     padding: 12,
+    backgroundColor: Colors.light.background,
   },
   dietTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: Colors.light.text,
     marginBottom: 4,
   },
   nutritionRow: {
@@ -240,11 +268,11 @@ const styles = StyleSheet.create({
   },
   nutritionText: {
     fontSize: 12,
-    color: '#ffffff',
+    color: Colors.light.text,
   },
   separator: {
     fontSize: 12,
-    color: '#ffffff',
+    color: Colors.light.text,
     marginHorizontal: 4,
   },
-}); 
+});
