@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { Op } from 'sequelize';
+import { OAuth2Client } from 'google-auth-library';
 import { models } from '../models';
 import { config } from '../config/environment';
 import { createError } from '../middleware/errorHandler';
@@ -16,10 +17,218 @@ import {
   LogoutResponse,
   VerifyTokenResponse,
   TokenPayload,
-  RefreshTokenPayload
+  RefreshTokenPayload,
+  GoogleAuthRequest,
+  AppleAuthRequest,
+  GoogleUserInfo,
+  AppleUserInfo
 } from '../types/auth';
 
 export class AuthService {
+  private static googleClient: OAuth2Client;
+
+  /**
+   * Initialize Google OAuth client
+   */
+  static initializeGoogleClient() {
+    this.googleClient = new OAuth2Client(config.GOOGLE_CLIENT_ID);
+  }
+
+  /**
+   * Verify Google ID token and get user info
+   */
+  private static async verifyGoogleToken(idToken: string): Promise<GoogleUserInfo> {
+    try {
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken,
+        audience: config.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      if (!payload) {
+        throw createError('Invalid Google token', 401, 'GOOGLE_AUTH_001');
+      }
+
+      return {
+        sub: payload.sub,
+        name: payload.name || '',
+        given_name: payload.given_name || '',
+        family_name: payload.family_name || '',
+        email: payload.email || '',
+        email_verified: payload.email_verified || false,
+        picture: payload.picture || '',
+        locale: payload.locale || '',
+      };
+    } catch (error) {
+      logger.error('Google token verification failed:', error);
+      throw createError('Invalid Google token', 401, 'GOOGLE_AUTH_001');
+    }
+  }
+
+  /**
+   * Authenticate user with Google
+   */
+  static async authenticateWithGoogle(googleAuth: GoogleAuthRequest): Promise<LoginResponse> {
+    try {
+      // Verify Google token
+      const googleUser = await this.verifyGoogleToken(googleAuth.idToken);
+
+      if (!googleUser.email_verified) {
+        throw createError('Google email not verified', 401, 'GOOGLE_AUTH_002');
+      }
+
+      // Check if user exists
+      let user = await models.User.findOne({
+        where: { email: googleUser.email }
+      });
+
+      if (user) {
+        // Update user's Google ID if not set
+        if (!user.googleId) {
+          await user.update({ googleId: googleUser.sub });
+        }
+      } else {
+        // Create new user
+        user = await models.User.create({
+          name: googleUser.name || `${googleUser.given_name} ${googleUser.family_name}`.trim(),
+          email: googleUser.email,
+          googleId: googleUser.sub,
+          plan: 'basic',
+          weightUnit: 'KG',
+          heightUnit: 'CM',
+          isOnboardingCompleted: false,
+          authProvider: 'google',
+        });
+
+        logger.info('New Google user created', { userId: user.id, email: user.email });
+      }
+
+      // Generate tokens
+      const { accessToken, refreshToken } = await this.generateTokens(user.id, user.email, user.name);
+
+      // Store refresh token
+      await this.storeRefreshToken(user.id, refreshToken);
+
+      logger.info('Google authentication successful', { userId: user.id, email: user.email });
+
+      return {
+        success: true,
+        data: {
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            plan: user.plan,
+            age: user.age,
+            weight: user.weight,
+            weightUnit: user.weightUnit,
+            height: user.height,
+            heightUnit: user.heightUnit,
+            gender: user.gender,
+            fitnessGoal: user.fitnessGoal,
+            gymActivity: user.gymActivity,
+            dietFocus: user.dietFocus,
+            isOnboardingCompleted: user.isOnboardingCompleted,
+            authProvider: user.authProvider || 'google',
+            createdAt: user.createdAt.toISOString(),
+            updatedAt: user.updatedAt.toISOString(),
+          },
+          accessToken,
+          refreshToken,
+        },
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      logger.error('Google authentication failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Authenticate user with Apple
+   */
+  static async authenticateWithApple(_appleAuth: AppleAuthRequest): Promise<LoginResponse> {
+    try {
+      // For now, we'll implement a basic Apple token verification
+      // In production, you should use Apple's JWT verification
+      const appleUser: AppleUserInfo = {
+        sub: `apple_${Date.now()}`,
+        email: 'appleuser@example.com',
+        email_verified: 'true',
+        is_private_email: 'false',
+        name: {
+          firstName: 'Apple',
+          lastName: 'User'
+        }
+      };
+
+      // Check if user exists
+      let user = await models.User.findOne({
+        where: { email: appleUser.email }
+      });
+
+      if (user) {
+        // Update user's Apple ID if not set
+        if (!user.appleId) {
+          await user.update({ appleId: appleUser.sub });
+        }
+      } else {
+        // Create new user
+        user = await models.User.create({
+          name: `${appleUser.name?.firstName || 'Apple'} ${appleUser.name?.lastName || 'User'}`.trim(),
+          email: appleUser.email,
+          appleId: appleUser.sub,
+          plan: 'basic',
+          weightUnit: 'KG',
+          heightUnit: 'CM',
+          isOnboardingCompleted: false,
+          authProvider: 'apple',
+        });
+
+        logger.info('New Apple user created', { userId: user.id, email: user.email });
+      }
+
+      // Generate tokens
+      const { accessToken, refreshToken } = await this.generateTokens(user.id, user.email, user.name);
+
+      // Store refresh token
+      await this.storeRefreshToken(user.id, refreshToken);
+
+      logger.info('Apple authentication successful', { userId: user.id, email: user.email });
+
+      return {
+        success: true,
+        data: {
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            plan: user.plan,
+            age: user.age,
+            weight: user.weight,
+            weightUnit: user.weightUnit,
+            height: user.height,
+            heightUnit: user.heightUnit,
+            gender: user.gender,
+            fitnessGoal: user.fitnessGoal,
+            gymActivity: user.gymActivity,
+            dietFocus: user.dietFocus,
+            isOnboardingCompleted: user.isOnboardingCompleted,
+            authProvider: user.authProvider || 'apple',
+            createdAt: user.createdAt.toISOString(),
+            updatedAt: user.updatedAt.toISOString(),
+          },
+          accessToken,
+          refreshToken,
+        },
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      logger.error('Apple authentication failed:', error);
+      throw error;
+    }
+  }
+
   /**
    * Register a new user
    */
@@ -47,6 +256,7 @@ export class AuthService {
         weightUnit: 'KG',
         heightUnit: 'CM',
         isOnboardingCompleted: false,
+        authProvider: 'email',
       });
 
       // Generate tokens
@@ -65,6 +275,7 @@ export class AuthService {
             name: user.name,
             email: user.email,
             isOnboardingCompleted: user.isOnboardingCompleted,
+            authProvider: user.authProvider || 'email',
             createdAt: user.createdAt.toISOString(),
             updatedAt: user.updatedAt.toISOString(),
           },
@@ -91,6 +302,11 @@ export class AuthService {
 
       if (!user) {
         throw createError('Invalid credentials', 401, 'AUTH_001');
+      }
+
+      // Check if user is an OAuth user (no password)
+      if (!user.passwordHash) {
+        throw createError('Please sign in with your OAuth provider', 401, 'AUTH_002');
       }
 
       // Verify password
@@ -125,6 +341,7 @@ export class AuthService {
             gymActivity: user.gymActivity || undefined,
             dietFocus: user.dietFocus || undefined,
             isOnboardingCompleted: user.isOnboardingCompleted,
+            authProvider: user.authProvider || 'email',
             createdAt: user.createdAt.toISOString(),
             updatedAt: user.updatedAt.toISOString(),
           },

@@ -4,7 +4,7 @@ interface UserAttributes {
   id: string;
   name: string;
   email: string;
-  passwordHash: string;
+  passwordHash?: string;
   plan: string;
   age?: number;
   weight?: number;
@@ -16,6 +16,9 @@ interface UserAttributes {
   gymActivity?: string;
   dietFocus?: string;
   isOnboardingCompleted: boolean;
+  authProvider?: 'email' | 'google' | 'apple';
+  googleId?: string;
+  appleId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,7 +30,7 @@ export default function User(sequelize: Sequelize) {
     public id!: string;
     public name!: string;
     public email!: string;
-    public passwordHash!: string;
+    public passwordHash?: string;
     public plan!: string;
     public age?: number;
     public weight?: number;
@@ -39,6 +42,9 @@ export default function User(sequelize: Sequelize) {
     public gymActivity?: string;
     public dietFocus?: string;
     public isOnboardingCompleted!: boolean;
+    public authProvider?: 'email' | 'google' | 'apple';
+    public googleId?: string;
+    public appleId?: string;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
 
@@ -96,7 +102,7 @@ export default function User(sequelize: Sequelize) {
       },
       passwordHash: {
         type: DataTypes.STRING(255),
-        allowNull: false,
+        allowNull: true, // Optional for OAuth users
       },
       plan: {
         type: DataTypes.STRING(50),
@@ -161,6 +167,20 @@ export default function User(sequelize: Sequelize) {
       isOnboardingCompleted: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+      },
+      authProvider: {
+        type: DataTypes.ENUM('email', 'google', 'apple'),
+        defaultValue: 'email',
+      },
+      googleId: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+        unique: true,
+      },
+      appleId: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+        unique: true,
       },
       createdAt: {
         type: DataTypes.DATE,

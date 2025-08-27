@@ -4,7 +4,9 @@ import { logger } from '../utils/logger';
 import { 
   LoginRequest, 
   RegisterRequest, 
-  RefreshTokenRequest 
+  RefreshTokenRequest,
+  GoogleAuthRequest,
+  AppleAuthRequest
 } from '../types/auth';
 
 export class AuthController {
@@ -35,6 +37,40 @@ export class AuthController {
       logger.info('User login attempt', { email: credentials.email });
       
       const result = await AuthService.login(credentials);
+      
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Authenticate with Google
+   */
+  static async authenticateWithGoogle(req: Request, res: Response, next: NextFunction) {
+    try {
+      const googleAuth: GoogleAuthRequest = req.body;
+      
+      logger.info('Google authentication attempt');
+      
+      const result = await AuthService.authenticateWithGoogle(googleAuth);
+      
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Authenticate with Apple
+   */
+  static async authenticateWithApple(req: Request, res: Response, next: NextFunction) {
+    try {
+      const appleAuth: AppleAuthRequest = req.body;
+      
+      logger.info('Apple authentication attempt');
+      
+      const result = await AuthService.authenticateWithApple(appleAuth);
       
       res.status(200).json(result);
     } catch (error) {
@@ -79,7 +115,7 @@ export class AuthController {
   /**
    * Verify access token
    */
-    static async verifyToken(req: Request, res: Response, next: NextFunction) {
+  static async verifyToken(req: Request, res: Response, next: NextFunction) {
     try {
       const authHeader = req.headers.authorization;
       const token = authHeader && authHeader.split(' ')[1];

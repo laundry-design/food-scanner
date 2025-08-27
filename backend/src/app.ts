@@ -18,6 +18,9 @@ import analyticsRoutes from './routes/analytics';
 // Import database
 import { sequelize } from './models';
 
+// Import AuthService for OAuth initialization
+import { AuthService } from './services/authService';
+
 const app = express();
 
 // Security middleware
@@ -109,12 +112,17 @@ const startServer = async () => {
       logger.info('Database synced successfully.');
     }
 
+    // Initialize Google OAuth client
+    AuthService.initializeGoogleClient();
+    logger.info('Google OAuth client initialized successfully.');
+
     // Start server
     const PORT = config.PORT;
     app.listen(PORT, () => {
       logger.info(`🚀 FoodScanner API server running on port ${PORT}`);
       logger.info(`📚 API Documentation available at http://localhost:${PORT}/api-docs`);
       logger.info(`🌍 Environment: ${config.NODE_ENV}`);
+      logger.info(`🔐 Google OAuth enabled with client ID: ${config.GOOGLE_CLIENT_ID}`);
     });
   } catch (error) {
     logger.error('Failed to start server:', error);

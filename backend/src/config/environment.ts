@@ -22,6 +22,13 @@ export const config = {
   JWT_EXPIRES_IN: process.env['JWT_EXPIRES_IN'] || '15m',
   JWT_REFRESH_EXPIRES_IN: process.env['JWT_REFRESH_EXPIRES_IN'] || '7d',
 
+  // OAuth Configuration
+  GOOGLE_CLIENT_ID: process.env['GOOGLE_CLIENT_ID'] || '367581443449-o1du4aq6gk2n27gqu8oleas1j130aoul.apps.googleusercontent.com',
+  GOOGLE_CLIENT_SECRET: process.env['GOOGLE_CLIENT_SECRET'] || '',
+  APPLE_CLIENT_ID: process.env['APPLE_CLIENT_ID'] || 'com.vinayakaryahey.real-app',
+  APPLE_TEAM_ID: process.env['APPLE_TEAM_ID'] || '',
+  APPLE_KEY_ID: process.env['APPLE_KEY_ID'] || '',
+
   // AI Service Configuration
   OPENAI_API_KEY: process.env['OPENAI_API_KEY'],
   AI_MODEL: process.env['AI_MODEL'] || 'gpt-4-vision-preview',

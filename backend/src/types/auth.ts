@@ -15,6 +15,14 @@ export interface RefreshTokenRequest {
   refreshToken: string;
 }
 
+export interface GoogleAuthRequest {
+  idToken: string;
+}
+
+export interface AppleAuthRequest {
+  idToken: string;
+}
+
 export interface LoginResponse extends ApiResponse {
   data: {
     user: {
@@ -32,6 +40,7 @@ export interface LoginResponse extends ApiResponse {
       gymActivity?: string;
       dietFocus?: string;
       isOnboardingCompleted: boolean;
+      authProvider?: 'email' | 'google' | 'apple';
       createdAt: string;
       updatedAt: string;
     };
@@ -47,6 +56,7 @@ export interface RegisterResponse extends ApiResponse {
       name: string;
       email: string;
       isOnboardingCompleted: boolean;
+      authProvider?: 'email' | 'google' | 'apple';
       createdAt: string;
       updatedAt: string;
     };
@@ -83,6 +93,7 @@ export interface VerifyTokenResponse extends ApiResponse {
       gymActivity?: string;
       dietFocus?: string;
       isOnboardingCompleted: boolean;
+      authProvider?: 'email' | 'google' | 'apple';
       createdAt: string;
       updatedAt: string;
     };
@@ -102,4 +113,26 @@ export interface RefreshTokenPayload {
   tokenId: string;
   iat: number;
   exp: number;
+}
+
+export interface GoogleUserInfo {
+  sub: string;
+  name: string;
+  given_name: string;
+  family_name: string;
+  email: string;
+  email_verified: boolean;
+  picture: string;
+  locale: string;
+}
+
+export interface AppleUserInfo {
+  sub: string;
+  email: string;
+  email_verified: string;
+  is_private_email: string;
+  name?: {
+    firstName: string;
+    lastName: string;
+  };
 }

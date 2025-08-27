@@ -50,6 +50,8 @@ export const useAppStores = () => {
     authIsLoading: authStore.isLoading,
     login: authStore.login,
     register: authStore.register,
+    loginWithGoogle: authStore.loginWithGoogle,
+    loginWithApple: authStore.loginWithApple,
     logout: authStore.logout,
     checkAuth: authStore.checkAuth,
     updateAuthUser: authStore.updateUser,

@@ -30,6 +30,17 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "your-eas-project-id"
+      }
+    },
+    "oauth": {
+      "google": {
+        "clientId": "367581443449-o1du4aq6gk2n27gqu8oleas1j130aoul.apps.googleusercontent.com",
+        "redirectUri": "realapp://auth"
+      }
     }
   }
 }

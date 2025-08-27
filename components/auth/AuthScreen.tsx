@@ -14,6 +14,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/stores/authStore';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 import { Colors } from '@/constants/Colors';
+import { SocialAuthService } from '@/services/socialAuth';
+import { mockApi } from '@/services/api';
 
 interface AuthScreenProps {
   onLoginSuccess: () => void;
@@ -27,7 +29,7 @@ export default function AuthScreen({ onLoginSuccess, onStartOnboarding }: AuthSc
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const { login, register, isLoading } = useAuthStore();
+  const { login, register, loginWithGoogle, loginWithApple, isLoading } = useAuthStore();
   const { startOnboarding } = useOnboardingStore();
 
   const handleSubmit = async () => {
@@ -61,6 +63,54 @@ export default function AuthScreen({ onLoginSuccess, onStartOnboarding }: AuthSc
       }
     } catch (error) {
       Alert.alert('Error', 'Something went wrong. Please try again.');
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      // First, get the Google ID token through OAuth flow
+      const socialResult = await SocialAuthService.signInWithGoogle();
+      
+      if (!socialResult.success || !socialResult.user) {
+        Alert.alert('Error', socialResult.error || 'Google OAuth failed');
+        return;
+      }
+
+      // Now call the store method with the real Google ID token
+      const result = await loginWithGoogle(socialResult.idToken);
+      
+      if (result.success) {
+        onLoginSuccess();
+      } else {
+        Alert.alert('Error', result.error || 'Google sign-in failed');
+      }
+    } catch (error) {
+      console.error('Google sign-in error:', error);
+      Alert.alert('Error', 'Google sign-in failed. Please try again.');
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    try {
+      // First, get the Apple ID token through OAuth flow
+      const socialResult = await SocialAuthService.signInWithApple();
+      
+      if (!socialResult.success || !socialResult.user) {
+        Alert.alert('Error', socialResult.error || 'Apple OAuth failed');
+        return;
+      }
+
+      // Now call the store method with the real Apple ID token
+      const result = await loginWithApple(socialResult.idToken);
+      
+      if (result.success) {
+        onLoginSuccess();
+      } else {
+        Alert.alert('Error', result.error || 'Apple sign-in failed');
+      }
+    } catch (error) {
+      console.error('Apple sign-in error:', error);
+      Alert.alert('Error', 'Apple sign-in failed. Please try again.');
     }
   };
 
@@ -162,6 +212,33 @@ export default function AuthScreen({ onLoginSuccess, onStartOnboarding }: AuthSc
             <View style={styles.dividerLine} />
           </View>
 
+          {/* Social Authentication Buttons */}
+          <View style={styles.socialButtonsContainer}>
+            <TouchableOpacity
+              style={[styles.socialButton, styles.googleButton]}
+              onPress={handleGoogleSignIn}
+              disabled={isLoading}
+            >
+              <Text style={styles.googleButtonText}>Continue with Google</Text>
+            </TouchableOpacity>
+
+            {Platform.OS === 'ios' && (
+              <TouchableOpacity
+                style={[styles.socialButton, styles.appleButton]}
+                onPress={handleAppleSignIn}
+                disabled={isLoading}
+              >
+                <Text style={styles.appleButtonText}>Continue with Apple</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>OR</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
           <TouchableOpacity
             style={styles.onboardingButton}
             onPress={handleStartOnboarding}
@@ -186,8 +263,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 40,
+    padding: 20,
   },
   header: {
     alignItems: 'center',
@@ -197,11 +273,12 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#ffffff',
-    marginBottom: 8,
+    textAlign: 'center',
+    marginBottom: 12,
   },
   subtitle: {
     fontSize: 16,
-    color: '#999999',
+    color: '#cccccc',
     textAlign: 'center',
   },
   form: {
@@ -212,22 +289,22 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontWeight: '600',
     color: '#ffffff',
     marginBottom: 8,
+    fontWeight: '500',
   },
   input: {
-    backgroundColor: '#2a2a2a',
+    backgroundColor: '#333333',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
     color: '#ffffff',
     borderWidth: 1,
-    borderColor: '#3a3a3a',
+    borderColor: '#444444',
   },
   button: {
-    backgroundColor: Colors.primary,
+    backgroundColor: '#99ff33',
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
@@ -237,43 +314,72 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#000000',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   switchButton: {
     alignItems: 'center',
     marginTop: 20,
   },
   switchText: {
-    color: Colors.primary,
-    fontSize: 14,
+    color: '#99ff33',
+    fontSize: 16,
+    textDecorationLine: 'underline',
   },
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 30,
+    marginVertical: 20,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#3a3a3a',
+    backgroundColor: '#444444',
   },
   dividerText: {
     color: '#666666',
-    marginHorizontal: 20,
     fontSize: 14,
+    marginHorizontal: 16,
   },
-  onboardingButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: Colors.primary,
+  socialButtonsContainer: {
+    gap: 16,
+    marginBottom: 20,
+  },
+  socialButton: {
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
+    borderWidth: 1,
+  },
+  googleButton: {
+    backgroundColor: '#ffffff',
+    borderColor: '#dddddd',
+  },
+  googleButtonText: {
+    color: '#333333',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  appleButton: {
+    backgroundColor: '#000000',
+    borderColor: '#333333',
+  },
+  appleButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  onboardingButton: {
+    backgroundColor: 'transparent',
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#99ff33',
   },
   onboardingButtonText: {
-    color: Colors.primary,
+    color: '#99ff33',
     fontSize: 16,
     fontWeight: '600',
   },

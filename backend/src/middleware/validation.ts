@@ -42,6 +42,18 @@ export const authSchemas = {
       refreshToken: z.string().min(1, 'Refresh token is required'),
     }),
   }),
+
+  googleAuth: z.object({
+    body: z.object({
+      idToken: z.string().min(1, 'Google ID token is required'),
+    }),
+  }),
+
+  appleAuth: z.object({
+    body: z.object({
+      idToken: z.string().min(1, 'Apple ID token is required'),
+    }),
+  }),
 };
 
 export const userSchemas = {
