@@ -55,5 +55,33 @@ export const useAppStores = () => {
     logout: authStore.logout,
     checkAuth: authStore.checkAuth,
     updateAuthUser: authStore.updateUser,
+
+    // User profile methods
+    getUserProfile: authStore.getUserProfile,
+    updateUserProfile: authStore.updateUserProfile,
+    completeAuthOnboarding: authStore.completeOnboarding,
+
+    // Nutrition methods
+    getDailyNutrition: authStore.getDailyNutrition,
+    getWeeklyNutrition: authStore.getWeeklyNutrition,
+    addManualNutritionEntry: authStore.addManualNutritionEntry,
+
+    // Food history methods
+    getFoodHistory: authStore.getFoodHistory,
+
+    // Diet management methods
+    getAllDiets: authStore.getAllDiets,
+    getUserDiets: authStore.getUserDiets,
+    addDietToUser: authStore.addDietToUser,
+    removeDietFromUser: authStore.removeDietFromUser,
+
+    // Food scanning methods
+    scanFood: authStore.scanFood,
+
+    // User goals & progress methods
+    getUserGoals: authStore.getUserGoals,
+    updateUserGoals: authStore.updateUserGoals,
+    addProgressEntry: authStore.addProgressEntry,
+    getProgressHistory: authStore.getProgressHistory,
   };
 }; 

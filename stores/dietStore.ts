@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { mockApi } from '@/services/api';
 
 export interface NutritionData {
   calories: { value: string; progress: number; color: string };
@@ -157,17 +158,48 @@ export const useDietStore = create<DietState>()(
       initializeDiets: async () => {
         set({ isLoading: true, error: null });
         try {
-          // Simulate API call delay
-          await new Promise(resolve => setTimeout(resolve, 500));
+          // Try to get diets from API first
+          const result = await mockApi.getAllDiets('mock_token');
           
-          set({ 
-            diets: mockDiets,
-            isLoading: false 
-          });
+          if (result.success && result.data) {
+            // Transform API data to match our DietData interface
+            const apiDiets: DietData[] = result.data.map((diet: any) => ({
+              id: diet.id,
+              title: diet.title,
+              description: diet.description,
+              nutrition: {
+                calories: { value: `${diet.calories || 0}`, progress: 0.5, color: '#ff6b6b' },
+                protein: { value: `${diet.protein || 0}g`, progress: 0.5, color: '#4ecdc4' },
+                carbs: { value: `${diet.carbs || 0}g`, progress: 0.5, color: '#45b7d1' },
+                fat: { value: `${diet.fat || 0}g`, progress: 0.5, color: '#f9ca24' },
+              },
+              goal: diet.goal || 'Healthy eating',
+              category: diet.category || 'General',
+              difficulty: diet.difficulty || 'Easy',
+              duration: diet.duration || '20 mins',
+              tags: diet.tags || ['Healthy'],
+              imageUrl: diet.imageUrl,
+              createdAt: diet.createdAt || new Date().toISOString(),
+              updatedAt: diet.updatedAt || new Date().toISOString(),
+            }));
+            
+            set({ 
+              diets: apiDiets,
+              isLoading: false 
+            });
+          } else {
+            // Fallback to mock data
+            set({ 
+              diets: mockDiets,
+              isLoading: false 
+            });
+          }
         } catch (error) {
           console.error('Error initializing diets:', error);
+          // Fallback to mock data on error
           set({ 
-            error: 'Failed to load diets',
+            diets: mockDiets,
+            error: 'Failed to load diets from API, using local data',
             isLoading: false 
           });
         }
@@ -190,12 +222,45 @@ export const useDietStore = create<DietState>()(
       addDietToUser: async (dietId: string, userId: string, notes?: string) => {
         set({ isLoading: true, error: null });
         try {
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 300));
+          // Try to add diet via API first
+          const result = await mockApi.addDietToUser('mock_token', dietId, notes);
           
+          if (result.success) {
+            const { userDiets } = get();
+            
+            // Check if already added
+            const existingEntry = userDiets.find(
+              entry => entry.dietId === dietId && entry.userId === userId
+            );
+            
+            if (existingEntry) {
+              set({ 
+                error: 'Diet already added to your list',
+                isLoading: false 
+              });
+              return;
+            }
+
+            const newEntry: UserDietEntry = {
+              id: result.data?.id || `user_diet_${Date.now()}`,
+              dietId,
+              userId,
+              addedAt: result.data?.addedAt || new Date().toISOString(),
+              notes,
+            };
+
+            set({ 
+              userDiets: [...userDiets, newEntry],
+              isLoading: false 
+            });
+          } else {
+            throw new Error('Failed to add diet via API');
+          }
+        } catch (error) {
+          console.error('Error adding diet to user:', error);
+          // Fallback to local state update
           const { userDiets } = get();
           
-          // Check if already added
           const existingEntry = userDiets.find(
             entry => entry.dietId === dietId && entry.userId === userId
           );
@@ -220,21 +285,31 @@ export const useDietStore = create<DietState>()(
             userDiets: [...userDiets, newEntry],
             isLoading: false 
           });
-        } catch (error) {
-          console.error('Error adding diet to user:', error);
-          set({ 
-            error: 'Failed to add diet',
-            isLoading: false 
-          });
         }
       },
 
       removeDietFromUser: async (dietId: string, userId: string) => {
         set({ isLoading: true, error: null });
         try {
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 300));
+          // Try to remove diet via API first
+          const result = await mockApi.removeDietFromUser('mock_token', dietId);
           
+          if (result.success) {
+            const { userDiets } = get();
+            const updatedUserDiets = userDiets.filter(
+              entry => !(entry.dietId === dietId && entry.userId === userId)
+            );
+
+            set({ 
+              userDiets: updatedUserDiets,
+              isLoading: false 
+            });
+          } else {
+            throw new Error('Failed to remove diet via API');
+          }
+        } catch (error) {
+          console.error('Error removing diet from user:', error);
+          // Fallback to local state update
           const { userDiets } = get();
           const updatedUserDiets = userDiets.filter(
             entry => !(entry.dietId === dietId && entry.userId === userId)
@@ -242,12 +317,6 @@ export const useDietStore = create<DietState>()(
 
           set({ 
             userDiets: updatedUserDiets,
-            isLoading: false 
-          });
-        } catch (error) {
-          console.error('Error removing diet from user:', error);
-          set({ 
-            error: 'Failed to remove diet',
             isLoading: false 
           });
         }

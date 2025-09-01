@@ -39,6 +39,65 @@ interface AuthState {
   checkAuth: () => Promise<boolean>;
   setLoading: (loading: boolean) => void;
   updateUser: (updates: Partial<AuthUser>) => void;
+  
+  // User profile methods
+  getUserProfile: () => Promise<{ success: boolean; data?: any; error?: string }>;
+  updateUserProfile: (profileData: any) => Promise<{ success: boolean; data?: any; error?: string }>;
+  completeOnboarding: (onboardingData: any) => Promise<{ success: boolean; data?: any; error?: string }>;
+  
+  // Nutrition methods
+  getDailyNutrition: (date?: string) => Promise<{ success: boolean; data?: any; error?: string }>;
+  getWeeklyNutrition: (startDate: string, endDate: string) => Promise<{ success: boolean; data?: any; error?: string }>;
+  addManualNutritionEntry: (nutritionData: any) => Promise<{ success: boolean; data?: any; error?: string }>;
+  
+  // Food history methods
+  getFoodHistory: (params?: {
+    startDate?: string;
+    endDate?: string;
+    mealType?: string;
+    limit?: number;
+    offset?: number;
+  }) => Promise<{ success: boolean; data?: any; error?: string }>;
+  
+  // Diet management methods
+  getAllDiets: () => Promise<{ success: boolean; data?: any; error?: string }>;
+  getUserDiets: () => Promise<{ success: boolean; data?: any; error?: string }>;
+  addDietToUser: (dietId: string, notes?: string) => Promise<{ success: boolean; data?: any; error?: string }>;
+  removeDietFromUser: (dietId: string) => Promise<{ success: boolean; data?: any; error?: string }>;
+  
+  // Food scanning methods
+  scanFood: (imageUri: string, mealType: string) => Promise<{ success: boolean; data?: any; error?: string }>;
+  
+  // User goals & progress methods
+  getUserGoals: () => Promise<{ success: boolean; data?: any; error?: string }>;
+  updateUserGoals: (goals: {
+    targetWeight?: number;
+    targetCalories?: number;
+    targetProtein?: number;
+    targetCarbs?: number;
+    targetFat?: number;
+    fitnessGoal?: string;
+    targetDate?: string;
+  }) => Promise<{ success: boolean; data?: any; error?: string }>;
+  addProgressEntry: (progress: {
+    weight?: number;
+    bodyFat?: number;
+    muscleMass?: number;
+    measurements?: {
+      chest?: number;
+      waist?: number;
+      hips?: number;
+      arms?: number;
+      thighs?: number;
+    };
+    notes?: string;
+  }) => Promise<{ success: boolean; data?: any; error?: string }>;
+  getProgressHistory: (params?: {
+    startDate?: string;
+    endDate?: string;
+    limit?: number;
+    offset?: number;
+  }) => Promise<{ success: boolean; data?: any; error?: string }>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -263,6 +322,475 @@ export const useAuthStore = create<AuthState>()(
           set({ 
             user: { ...user, ...updates, updatedAt: new Date().toISOString() } 
           });
+        }
+      },
+
+      completeOnboarding: async (onboardingData: any): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.completeOnboarding(token, onboardingData);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to complete onboarding');
+          }
+        } catch (error) {
+          console.error('Complete onboarding error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to complete onboarding' 
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      // ===== USER PROFILE METHODS =====
+      getUserProfile: async (): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.getUserProfile(token);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to get user profile');
+          }
+        } catch (error) {
+          console.error('Get user profile error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to get user profile' 
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      updateUserProfile: async (profileData: any): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.updateUserProfile(token, profileData);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to update user profile');
+          }
+        } catch (error) {
+          console.error('Update user profile error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to update user profile' 
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      // ===== NUTRITION METHODS =====
+      getDailyNutrition: async (date?: string): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.getDailyNutrition(token, date);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to get daily nutrition');
+          }
+        } catch (error) {
+          console.error('Get daily nutrition error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to get daily nutrition' 
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      getWeeklyNutrition: async (startDate: string, endDate: string): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.getWeeklyNutrition(token, startDate, endDate);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to get weekly nutrition');
+          }
+        } catch (error) {
+          console.error('Get weekly nutrition error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to get weekly nutrition' 
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      addManualNutritionEntry: async (nutritionData: any): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.addManualNutritionEntry(token, nutritionData);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to add manual nutrition entry');
+          }
+        } catch (error) {
+          console.error('Add manual nutrition entry error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to add manual nutrition entry' 
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      // ===== FOOD HISTORY METHODS =====
+      getFoodHistory: async (params?: {
+        startDate?: string;
+        endDate?: string;
+        mealType?: string;
+        limit?: number;
+        offset?: number;
+      }): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.getFoodHistory(token, params);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to get food history');
+          }
+        } catch (error) {
+          console.error('Get food history error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to get food history' 
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      // ===== DIET MANAGEMENT METHODS =====
+      getAllDiets: async (): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.getAllDiets(token);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to get all diets');
+          }
+        } catch (error) {
+          console.error('Get all diets error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to get all diets' 
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      getUserDiets: async (): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.getUserDiets(token);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to get user diets');
+          }
+        } catch (error) {
+          console.error('Get user diets error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to get user diets' 
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      addDietToUser: async (dietId: string, notes?: string): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.addDietToUser(token, dietId, notes);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to add diet to user');
+          }
+        } catch (error) {
+          console.error('Add diet to user error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to add diet to user' 
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      removeDietFromUser: async (dietId: string): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.removeDietFromUser(token, dietId);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to remove diet from user');
+          }
+        } catch (error) {
+          console.error('Remove diet from user error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to remove diet from user' 
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      // ===== FOOD SCANNING METHODS =====
+      scanFood: async (imageUri: string, mealType: string): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.scanFood(token, imageUri, mealType);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to scan food');
+          }
+        } catch (error) {
+          console.error('Scan food error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to scan food' 
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      // ===== USER GOALS & PROGRESS METHODS =====
+      getUserGoals: async (): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.getUserGoals(token);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to get user goals');
+          }
+        } catch (error) {
+          console.error('Get user goals error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to get user goals' 
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      updateUserGoals: async (goals: {
+        targetWeight?: number;
+        targetCalories?: number;
+        targetProtein?: number;
+        targetCarbs?: number;
+        targetFat?: number;
+        fitnessGoal?: string;
+        targetDate?: string;
+      }): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.updateUserGoals(token, goals);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to update user goals');
+          }
+        } catch (error) {
+          console.error('Update user goals error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to update user goals' 
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      addProgressEntry: async (progress: {
+        weight?: number;
+        bodyFat?: number;
+        muscleMass?: number;
+        measurements?: {
+          chest?: number;
+          waist?: number;
+          hips?: number;
+          arms?: number;
+          thighs?: number;
+        };
+        notes?: string;
+      }): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.addProgressEntry(token, progress);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to add progress entry');
+          }
+        } catch (error) {
+          console.error('Add progress entry error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to add progress entry' 
+          };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      getProgressHistory: async (params?: {
+        startDate?: string;
+        endDate?: string;
+        limit?: number;
+        offset?: number;
+      }): Promise<{ success: boolean; data?: any; error?: string }> => {
+        try {
+          set({ isLoading: true });
+          const { token } = get();
+          
+          if (!token) {
+            throw new Error('No authentication token');
+          }
+
+          const response = await mockApi.getProgressHistory(token, params);
+          
+          if (response.success) {
+            return { success: true, data: response.data };
+          } else {
+            throw new Error('Failed to get progress history');
+          }
+        } catch (error) {
+          console.error('Get progress history error:', error);
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Failed to get progress history' 
+          };
+        } finally {
+          set({ isLoading: false });
         }
       },
     }),
